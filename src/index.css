@@ -1,0 +1,199 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-display: 'Sora', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  --color-nebula-blue: #3b82f6;
+  --color-nebula-violet: #7c5cff;
+  --color-nebula-cyan: #38bdf8;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* ---------------------------------------------------------------- */
+/* Theme tokens — dark (default) and light, switched via            */
+/* <html data-theme="dark|light">. Every component reads these      */
+/* CSS variables, so toggling the attribute reskins the whole site. */
+/* ---------------------------------------------------------------- */
+:root,
+html[data-theme='dark'] {
+  --surface: #05070f;
+  --surface-soft: #0a0e1c;
+  --surface-strong: #000000;
+  --surface-card: rgba(255, 255, 255, 0.03);
+  --surface-card-hover: rgba(255, 255, 255, 0.06);
+
+  --text-primary: #ffffff;
+  --text-secondary: #9aa3b8;
+  --text-tertiary: #c7cdde;
+
+  --border-soft: rgba(255, 255, 255, 0.1);
+  --border-mid: rgba(255, 255, 255, 0.18);
+
+  --input-bg: rgba(255, 255, 255, 0.05);
+  --overlay-glow: rgba(59, 130, 246, 0.1);
+
+  --glass-a: rgba(255, 255, 255, 0.1);
+  --glass-b: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --glass-dense-a: rgba(10, 14, 28, 0.75);
+  --glass-dense-b: rgba(10, 14, 28, 0.55);
+  --glass-shine-1: rgba(255, 255, 255, 0.22);
+  --glass-shine-2: rgba(120, 170, 255, 0.12);
+
+  --scroll-bg-start: #0a0e1c;
+  --scroll-bg-end: #000000;
+
+  --starfield-opacity: 0.6;
+  --hero-glow-opacity: 1;
+
+  --mountain-far: #0c1226;
+  --mountain-mid: #080c1b;
+  --mountain-near: #04060f;
+}
+
+html[data-theme='light'] {
+  --surface: #eef3fa;
+  --surface-soft: #f4f8fc;
+  --surface-strong: #eef2f8;
+  --surface-card: rgba(28, 38, 58, 0.035);
+  --surface-card-hover: rgba(28, 38, 58, 0.06);
+
+  --text-primary: #232c3d;
+  --text-secondary: #5c6780;
+  --text-tertiary: #3c4760;
+
+  --border-soft: rgba(28, 38, 58, 0.09);
+  --border-mid: rgba(28, 38, 58, 0.16);
+
+  --input-bg: rgba(28, 38, 58, 0.035);
+  --overlay-glow: rgba(59, 130, 246, 0.07);
+
+  --glass-a: rgba(255, 255, 255, 0.55);
+  --glass-b: rgba(255, 255, 255, 0.25);
+  --glass-border: rgba(28, 38, 58, 0.1);
+  --glass-dense-a: rgba(244, 248, 252, 0.82);
+  --glass-dense-b: rgba(238, 243, 250, 0.65);
+  --glass-shine-1: rgba(255, 255, 255, 0.45);
+  --glass-shine-2: rgba(120, 170, 255, 0.16);
+
+  --scroll-bg-start: #eef3fa;
+  --scroll-bg-end: #d9e7f7;
+
+  --starfield-opacity: 0;
+  --hero-glow-opacity: 0.35;
+
+  --mountain-far: #d3e2f2;
+  --mountain-mid: #b9cfe8;
+  --mountain-near: #9db8da;
+}
+
+body {
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  background-color: var(--surface);
+  color: var(--text-primary);
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+}
+
+/* Starfield background (dark mode only — faded out in light mode) */
+.starfield {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1px 1px at 20px 30px, white, transparent),
+    radial-gradient(1px 1px at 90px 120px, white, transparent),
+    radial-gradient(1.5px 1.5px at 160px 60px, white, transparent),
+    radial-gradient(1px 1px at 220px 180px, white, transparent),
+    radial-gradient(1px 1px at 300px 90px, white, transparent),
+    radial-gradient(1.5px 1.5px at 340px 220px, white, transparent),
+    radial-gradient(1px 1px at 40px 250px, white, transparent),
+    radial-gradient(1px 1px at 400px 40px, white, transparent),
+    radial-gradient(1.5px 1.5px at 460px 160px, white, transparent),
+    radial-gradient(1px 1px at 500px 260px, white, transparent);
+  background-repeat: repeat;
+  background-size: 550px 300px;
+  opacity: var(--starfield-opacity);
+  animation: twinkle 6s ease-in-out infinite alternate;
+  transition: opacity 0.5s ease;
+}
+
+@keyframes twinkle {
+  from { opacity: calc(var(--starfield-opacity) * 0.6); }
+  to { opacity: var(--starfield-opacity); }
+}
+
+.text-gradient {
+  background: linear-gradient(90deg, var(--color-nebula-blue), var(--color-nebula-violet));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.btn-gradient {
+  background: linear-gradient(90deg, var(--color-nebula-blue), var(--color-nebula-violet));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .starfield, .animate-orbit, .animate-float {
+    animation: none !important;
+  }
+}
+
+/* Liquid glass navbar */
+.liquid-glass {
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--glass-a), var(--glass-b));
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.liquid-glass--dense {
+  background: linear-gradient(180deg, var(--glass-dense-a), var(--glass-dense-b));
+}
+
+.liquid-glass__shine {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 60% at 15% 0%, var(--glass-shine-1), transparent 60%),
+    radial-gradient(120% 60% at 85% 100%, var(--glass-shine-2), transparent 60%);
+  mix-blend-mode: screen;
+}
+
+/* Mountain silhouette layers under the hero, like the reference design */
+.mountains {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 220px;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.mountains svg {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.mountains svg polygon {
+  transition: fill 0.5s ease, opacity 0.5s ease;
+}
