@@ -25,7 +25,7 @@ export default function DestinationsPage() {
         icon={Globe}
         eyebrow={`${destinations.length} destinations`}
         title="Where would you like to go?"
-        subtitle="Every destination guide currently live on Voyora."
+        subtitle="Every destination guide currently live on Voyora"
       />
       <section className="mx-auto max-w-6xl px-6 pb-24 lg:px-10">
         <div className="mb-8 flex flex-wrap gap-2">
