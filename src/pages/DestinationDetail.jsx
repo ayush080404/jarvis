@@ -1,10 +1,86 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
-import { MapPin, Calendar, Coins, CheckCircle2, ArrowLeft } from 'lucide-react';
-import { getDestinationBySlug } from '../data/destinations';
+import {
+  MapPin,
+  Calendar,
+  Coins,
+  CheckCircle2,
+  ArrowLeft,
+  Sparkles,
+  UtensilsCrossed,
+  Languages,
+  Plane,
+  Stamp,
+  CalendarRange,
+  Bookmark,
+  BookmarkCheck,
+  Share2,
+  Map as MapIcon,
+} from 'lucide-react';
+import { destinations, getDestinationBySlug } from '../data/destinations';
+import DestinationCard from '../components/DestinationCard';
+
+const SAVED_KEY = 'voyora:saved-destinations';
+
+function readSaved() {
+  try {
+    return JSON.parse(localStorage.getItem(SAVED_KEY) || '[]');
+  } catch {
+    return [];
+  }
+}
 
 export default function DestinationDetail() {
   const { slug } = useParams();
   const destination = getDestinationBySlug(slug);
+
+  const [saved, setSaved] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
+  const [activeSection, setActiveSection] = useState('overview');
+  const sectionRefs = useRef({});
+
+  useEffect(() => {
+    if (!slug) return;
+    setSaved(readSaved().includes(slug));
+  }, [slug]);
+
+  const navItems = useMemo(() => {
+    if (!destination) return [];
+    const items = [{ id: 'overview', label: 'Overview' }];
+    if (destination.placesToVisit?.length > 0 || destination.highlights?.length > 0) {
+      items.push({ id: 'places', label: 'Places' });
+    }
+    if (destination.lat != null && destination.lng != null) {
+      items.push({ id: 'map', label: 'Map' });
+    }
+    if (destination.mustTryExperiences?.length > 0) {
+      items.push({ id: 'experiences', label: 'Experiences' });
+    }
+    if (destination.mustTryFood?.length > 0) {
+      items.push({ id: 'food', label: 'Food' });
+    }
+    if (destination.gallery?.length > 0) {
+      items.push({ id: 'gallery', label: 'Gallery' });
+    }
+    return items;
+  }, [destination]);
+
+  useEffect(() => {
+    if (navItems.length === 0) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) setActiveSection(entry.target.id);
+        });
+      },
+      { rootMargin: '-140px 0px -65% 0px', threshold: 0 }
+    );
+    navItems.forEach(({ id }) => {
+      const el = sectionRefs.current[id];
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, [navItems]);
 
   if (!destination) return <Navigate to="/destinations" replace />;
 
@@ -20,7 +96,67 @@ export default function DestinationDetail() {
     heroImage,
     accentColor,
     gallery,
+    mustTryExperiences,
+    mustTryFood,
+    idealStay,
+    language,
+    nearestAirport,
+    visaNote,
+    lat,
+    lng,
   } = destination;
+
+  function registerSection(id) {
+    return (el) => {
+      sectionRefs.current[id] = el;
+    };
+  }
+
+  function scrollToSection(id) {
+    const el = sectionRefs.current[id];
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function toggleSaved() {
+    const current = readSaved();
+    const next = current.includes(slug)
+      ? current.filter((s) => s !== slug)
+      : [...current, slug];
+    localStorage.setItem(SAVED_KEY, JSON.stringify(next));
+    setSaved(next.includes(slug));
+  }
+
+  async function handleShare() {
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: `${name} — Voyora`, url });
+      } catch {
+        /* user cancelled — no-op */
+      }
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    } catch {
+      /* clipboard unavailable — no-op */
+    }
+  }
+
+  const related = destinations
+    .filter((d) => d.slug !== slug && d.country === country)
+    .slice(0, 3);
+  const relatedFinal =
+    related.length >= 3
+      ? related
+      : [
+          ...related,
+          ...destinations
+            .filter((d) => d.slug !== slug && !related.includes(d))
+            .slice(0, 3 - related.length),
+        ];
 
   return (
     <div className="relative">
@@ -64,8 +200,8 @@ export default function DestinationDetail() {
           }}
         />
 
-        <div className="absolute inset-x-0 top-0 px-6 pt-28 lg:px-10 lg:pt-32">
-          <div className="mx-auto max-w-4xl">
+        <div className="absolute inset-x-0 top-0 flex items-center justify-between px-6 pt-28 lg:px-10 lg:pt-32">
+          <div className="mx-auto flex w-full max-w-4xl items-center justify-between">
             <Link
               to="/destinations"
               className="inline-flex items-center gap-2 text-sm font-medium text-white/85 transition-colors hover:text-white"
@@ -73,6 +209,28 @@ export default function DestinationDetail() {
               <ArrowLeft size={15} />
               Back to destinations
             </Link>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={toggleSaved}
+                aria-label={saved ? 'Remove from saved' : 'Save destination'}
+                className="grid h-9 w-9 place-items-center rounded-full border border-white/25 bg-black/20 text-white backdrop-blur transition-colors hover:bg-black/35"
+              >
+                {saved ? <BookmarkCheck size={15} /> : <Bookmark size={15} />}
+              </button>
+              <button
+                onClick={handleShare}
+                aria-label="Share destination"
+                className="grid h-9 w-9 place-items-center rounded-full border border-white/25 bg-black/20 text-white backdrop-blur transition-colors hover:bg-black/35"
+              >
+                <Share2 size={15} />
+              </button>
+              {shareCopied && (
+                <span className="rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-white backdrop-blur">
+                  Link copied
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -92,35 +250,116 @@ export default function DestinationDetail() {
         </div>
       </div>
 
-      <div className="relative mx-auto max-w-4xl px-6 pb-24 pt-10 lg:px-10">
-        <p className="max-w-2xl text-(--text-secondary)">{description}</p>
+      {/* Sticky mini nav: lets people jump straight to Places, Map,
+          Experiences, Food, or Gallery instead of scrolling through
+          everything in between. */}
+      {navItems.length > 1 && (
+        <div className="sticky top-20 z-40 w-full border-b border-(--border-soft) bg-(--surface)/85 backdrop-blur-md sm:top-24">
+          <div className="mx-auto flex max-w-4xl gap-1 overflow-x-auto px-6 py-2.5 lg:px-10">
+            {navItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => scrollToSection(item.id)}
+                className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors ${
+                  activeSection === item.id
+                    ? 'text-white'
+                    : 'text-(--text-secondary) hover:text-(--text-primary)'
+                }`}
+                style={activeSection === item.id ? { backgroundColor: accentColor } : undefined}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
-        <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="rounded-2xl border border-(--border-soft) bg-(--surface-card) p-5">
-            <div className="mb-2 flex items-center gap-2" style={{ color: accentColor }}>
-              <Calendar size={16} />
-              <span className="text-xs font-semibold uppercase tracking-wide text-(--text-secondary)">
-                Best time to visit
-              </span>
+      <div className="relative mx-auto max-w-4xl px-6 pb-24 pt-10 lg:px-10">
+        <div ref={registerSection('overview')} className="scroll-mt-32">
+          <p className="max-w-2xl text-(--text-secondary)">{description}</p>
+
+          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="rounded-2xl border border-(--border-soft) bg-(--surface-card) p-5">
+              <div className="mb-2 flex items-center gap-2" style={{ color: accentColor }}>
+                <Calendar size={16} />
+                <span className="text-xs font-semibold uppercase tracking-wide text-(--text-secondary)">
+                  Best time
+                </span>
+              </div>
+              <p className="text-sm text-(--text-primary)">{bestTime}</p>
             </div>
-            <p className="text-(--text-primary)">{bestTime}</p>
-          </div>
-          <div className="rounded-2xl border border-(--border-soft) bg-(--surface-card) p-5">
-            <div className="mb-2 flex items-center gap-2" style={{ color: accentColor }}>
-              <Coins size={16} />
-              <span className="text-xs font-semibold uppercase tracking-wide text-(--text-secondary)">
-                Currency
-              </span>
+            <div className="rounded-2xl border border-(--border-soft) bg-(--surface-card) p-5">
+              <div className="mb-2 flex items-center gap-2" style={{ color: accentColor }}>
+                <Coins size={16} />
+                <span className="text-xs font-semibold uppercase tracking-wide text-(--text-secondary)">
+                  Currency
+                </span>
+              </div>
+              <p className="text-sm text-(--text-primary)">{currency}</p>
             </div>
-            <p className="text-(--text-primary)">{currency}</p>
+            {idealStay && (
+              <div className="rounded-2xl border border-(--border-soft) bg-(--surface-card) p-5">
+                <div className="mb-2 flex items-center gap-2" style={{ color: accentColor }}>
+                  <CalendarRange size={16} />
+                  <span className="text-xs font-semibold uppercase tracking-wide text-(--text-secondary)">
+                    Ideal stay
+                  </span>
+                </div>
+                <p className="text-sm text-(--text-primary)">{idealStay}</p>
+              </div>
+            )}
+            {language && (
+              <div className="rounded-2xl border border-(--border-soft) bg-(--surface-card) p-5">
+                <div className="mb-2 flex items-center gap-2" style={{ color: accentColor }}>
+                  <Languages size={16} />
+                  <span className="text-xs font-semibold uppercase tracking-wide text-(--text-secondary)">
+                    Language
+                  </span>
+                </div>
+                <p className="text-sm text-(--text-primary)">{language}</p>
+              </div>
+            )}
           </div>
+
+          {(nearestAirport || visaNote) && (
+            <div className="mt-4 rounded-2xl border border-(--border-soft) bg-(--surface-card) p-5">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {nearestAirport && (
+                  <div>
+                    <div className="mb-2 flex items-center gap-2" style={{ color: accentColor }}>
+                      <Plane size={16} />
+                      <span className="text-xs font-semibold uppercase tracking-wide text-(--text-secondary)">
+                        Nearest airport
+                      </span>
+                    </div>
+                    <p className="text-sm text-(--text-primary)">{nearestAirport}</p>
+                  </div>
+                )}
+                {visaNote && (
+                  <div>
+                    <div className="mb-2 flex items-center gap-2" style={{ color: accentColor }}>
+                      <Stamp size={16} />
+                      <span className="text-xs font-semibold uppercase tracking-wide text-(--text-secondary)">
+                        Visa
+                      </span>
+                    </div>
+                    <p className="text-sm text-(--text-primary)">{visaNote}</p>
+                  </div>
+                )}
+              </div>
+              <p className="mt-4 text-xs text-(--text-secondary)">
+                Visa and entry rules depend on your nationality — always confirm with an official
+                source before booking.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Rich, per-place breakdown when a destination has one (currently
             Paris/France) — falls back to the short "Don't miss" bullet list
             for every other destination. */}
         {placesToVisit && placesToVisit.length > 0 ? (
-          <div className="mt-10">
+          <div ref={registerSection('places')} className="mt-10 scroll-mt-32">
             <h2 className="font-display text-xl font-semibold text-(--text-primary)">
               Places to visit in {country}
             </h2>
@@ -176,23 +415,100 @@ export default function DestinationDetail() {
             </div>
           </div>
         ) : (
-          <div className="mt-8">
-            <h2 className="font-display text-lg font-semibold text-(--text-primary)">
-              Don&apos;t miss
-            </h2>
-            <ul className="mt-4 space-y-3">
-              {highlights.map((h) => (
-                <li key={h} className="flex items-start gap-3 text-(--text-secondary)">
-                  <CheckCircle2 size={18} className="mt-0.5 shrink-0" style={{ color: accentColor }} />
-                  <span>{h}</span>
-                </li>
+          highlights &&
+          highlights.length > 0 && (
+            <div ref={registerSection('places')} className="mt-8 scroll-mt-32">
+              <h2 className="font-display text-lg font-semibold text-(--text-primary)">
+                Don&apos;t miss
+              </h2>
+              <ul className="mt-4 space-y-3">
+                {highlights.map((h) => (
+                  <li key={h} className="flex items-start gap-3 text-(--text-secondary)">
+                    <CheckCircle2 size={18} className="mt-0.5 shrink-0" style={{ color: accentColor }} />
+                    <span>{h}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )
+        )}
+
+        {lat != null && lng != null && (
+          <div ref={registerSection('map')} className="mt-10 scroll-mt-32">
+            <div className="flex items-center gap-2">
+              <MapIcon size={18} style={{ color: accentColor }} />
+              <h2 className="font-display text-lg font-semibold text-(--text-primary)">
+                Map
+              </h2>
+            </div>
+            <p className="mt-1.5 text-sm text-(--text-secondary)">
+              Centered on {name} — use it alongside the places above to get a feel for the area.
+            </p>
+            <div className="mt-5 overflow-hidden rounded-2xl border border-(--border-soft)">
+              <iframe
+                title={`Map of ${name}`}
+                className="h-80 w-full"
+                loading="lazy"
+                src={`https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.4}%2C${
+                  lat - 0.25
+                }%2C${lng + 0.4}%2C${lat + 0.25}&layer=mapnik&marker=${lat}%2C${lng}`}
+              />
+            </div>
+          </div>
+        )}
+
+        {mustTryExperiences && mustTryExperiences.length > 0 && (
+          <div ref={registerSection('experiences')} className="mt-10 scroll-mt-32">
+            <div className="flex items-center gap-2">
+              <Sparkles size={18} style={{ color: accentColor }} />
+              <h2 className="font-display text-lg font-semibold text-(--text-primary)">
+                Must-try experiences
+              </h2>
+            </div>
+            <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {mustTryExperiences.map((exp) => (
+                <div
+                  key={exp}
+                  className="flex items-start gap-3 rounded-xl border border-(--border-soft) bg-(--surface-card) p-4"
+                >
+                  <span
+                    className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full"
+                    style={{ backgroundColor: `${accentColor}25` }}
+                  >
+                    <Sparkles size={12} style={{ color: accentColor }} />
+                  </span>
+                  <span className="text-sm text-(--text-secondary)">{exp}</span>
+                </div>
               ))}
-            </ul>
+            </div>
+          </div>
+        )}
+
+        {mustTryFood && mustTryFood.length > 0 && (
+          <div ref={registerSection('food')} className="mt-10 scroll-mt-32">
+            <div className="flex items-center gap-2">
+              <UtensilsCrossed size={18} style={{ color: accentColor }} />
+              <h2 className="font-display text-lg font-semibold text-(--text-primary)">
+                Must-try food
+              </h2>
+            </div>
+            <div className="mt-5 flex flex-wrap gap-2.5">
+              {mustTryFood.map((food) => (
+                <span
+                  key={food}
+                  className="rounded-full border border-(--border-soft) bg-(--surface-card) px-4 py-2 text-sm font-medium text-(--text-primary) transition-colors"
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = `${accentColor}20`)}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '')}
+                >
+                  {food}
+                </span>
+              ))}
+            </div>
           </div>
         )}
 
         {gallery && gallery.length > 0 && (
-          <div className="mt-10">
+          <div ref={registerSection('gallery')} className="mt-10 scroll-mt-32">
             <h2 className="mb-4 font-display text-lg font-semibold text-(--text-primary)">
               More of {name}
             </h2>
@@ -201,6 +517,19 @@ export default function DestinationDetail() {
                 <div key={src} className="aspect-[4/3] overflow-hidden rounded-xl">
                   <img src={src} alt="" className="h-full w-full object-cover" />
                 </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {relatedFinal.length > 0 && (
+          <div className="mt-14">
+            <h2 className="font-display text-lg font-semibold text-(--text-primary)">
+              You might also like
+            </h2>
+            <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {relatedFinal.map((d) => (
+                <DestinationCard key={d.slug} destination={d} />
               ))}
             </div>
           </div>

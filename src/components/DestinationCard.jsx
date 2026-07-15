@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
-import { MapPin } from 'lucide-react';
+import { Calendar, MapPin, Layers } from 'lucide-react';
 
 export default function DestinationCard({ destination }) {
-  const { slug, name, country, tag, heroImage, accentColor } = destination;
+  const { slug, name, country, tag, heroImage, accentColor, placesToVisit, bestTime } = destination;
 
   return (
     <Link
@@ -42,6 +42,27 @@ export default function DestinationCard({ destination }) {
         </div>
         <h3 className="font-display text-xl font-semibold text-(--text-primary)">{name}</h3>
         <p className="mt-1 text-sm text-(--text-secondary)">{tag}</p>
+
+        {(placesToVisit?.length > 0 || bestTime) && (
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {placesToVisit?.length > 0 && (
+              <span className="inline-flex items-center gap-1 rounded-full border border-(--border-soft) px-2.5 py-1 text-[11px] font-medium text-(--text-secondary)">
+                <Layers size={11} />
+                {placesToVisit.length} spots
+              </span>
+            )}
+            {bestTime && (
+              <span
+                title={bestTime}
+                className="inline-flex max-w-[13rem] items-center gap-1 truncate rounded-full border border-(--border-soft) px-2.5 py-1 text-[11px] font-medium text-(--text-secondary)"
+              >
+                <Calendar size={11} className="shrink-0" />
+                <span className="truncate">{bestTime}</span>
+              </span>
+            )}
+          </div>
+        )}
+
         <span className="mt-5 inline-block text-sm font-medium text-(--text-secondary) transition-colors group-hover:text-(--text-primary)">
           View guide &rarr;
         </span>
