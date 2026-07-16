@@ -31,6 +31,7 @@ const netherlands = {
   ],
   accentColor: "#5a8fd6",
   idealStay: "4–5 days",
+  themes: ["culture", "nature"],
   language: "Dutch (English widely spoken)",
   nearestAirport: "Amsterdam Airport Schiphol (AMS)",
   visaNote: "Schengen Area — many nationalities can visit visa-free for short stays",

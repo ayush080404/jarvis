@@ -1,8 +1,26 @@
-import { Link } from 'react-router-dom';
-import { Mail, Lock, Eye } from 'lucide-react';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import AuthLayout from '../components/AuthLayout';
+import { login } from '../utils/auth';
 
 export default function Login() {
+  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    const result = login({ email, password });
+    if (result.error) {
+      setError(result.error);
+      return;
+    }
+    navigate('/');
+  }
+
   return (
     <AuthLayout
       eyebrow="Welcome back"
@@ -24,7 +42,7 @@ export default function Login() {
         </Link>
       </p>
 
-      <form className="mt-8 space-y-4">
+      <form onSubmit={handleSubmit} className="mt-8 space-y-4">
         <div>
           <label className="mb-1.5 block text-sm font-medium text-(--text-secondary)">
             Email
@@ -33,6 +51,8 @@ export default function Login() {
             <Mail size={16} className="shrink-0 text-(--text-secondary)" />
             <input
               type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               className="w-full bg-transparent text-sm text-(--text-primary) placeholder:text-(--text-secondary) focus:outline-none"
             />
@@ -42,27 +62,40 @@ export default function Login() {
         <div>
           <div className="mb-1.5 flex items-center justify-between">
             <label className="block text-sm font-medium text-(--text-secondary)">Password</label>
-            <a href="#" className="text-xs font-medium text-sky-500 hover:underline">
-              Forgot password?
-            </a>
+            <span className="text-xs font-medium text-(--text-secondary)">Demo mode</span>
           </div>
           <div className="flex items-center gap-2.5 rounded-xl border border-(--border-soft) bg-(--input-bg) px-4 py-2.5">
             <Lock size={16} className="shrink-0 text-(--text-secondary)" />
             <input
-              type="password"
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               className="w-full bg-transparent text-sm text-(--text-primary) placeholder:text-(--text-secondary) focus:outline-none"
             />
-            <Eye size={16} className="shrink-0 cursor-pointer text-(--text-secondary)" />
+            <button
+              type="button"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              onClick={() => setShowPassword((s) => !s)}
+              className="shrink-0 text-(--text-secondary)"
+            >
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
           </div>
         </div>
 
+        {error && <p className="text-sm text-rose-500">{error}</p>}
+
         <button
-          type="button"
+          type="submit"
           className="btn-gradient w-full rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-[0_0_25px_rgba(59,130,246,0.35)] transition-transform hover:scale-[1.01]"
         >
           Log in
         </button>
+
+        <p className="text-center text-xs text-(--text-secondary)">
+          Accounts are stored only in this browser for now — there&apos;s no real backend yet.
+        </p>
       </form>
 
       <div className="my-6 flex items-center gap-3">
@@ -74,13 +107,17 @@ export default function Login() {
       <div className="grid grid-cols-2 gap-3">
         <button
           type="button"
-          className="rounded-xl border border-(--border-soft) py-2.5 text-sm font-medium text-(--text-primary) transition-colors hover:border-(--border-mid)"
+          disabled
+          title="Not connected yet"
+          className="cursor-not-allowed rounded-xl border border-(--border-soft) py-2.5 text-sm font-medium text-(--text-secondary) opacity-60"
         >
           Google
         </button>
         <button
           type="button"
-          className="rounded-xl border border-(--border-soft) py-2.5 text-sm font-medium text-(--text-primary) transition-colors hover:border-(--border-mid)"
+          disabled
+          title="Not connected yet"
+          className="cursor-not-allowed rounded-xl border border-(--border-soft) py-2.5 text-sm font-medium text-(--text-secondary) opacity-60"
         >
           Apple
         </button>

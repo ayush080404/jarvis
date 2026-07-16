@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
-import { Search, Globe2, Menu, X } from 'lucide-react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Search, Globe2, Menu, X, LogOut, Bookmark } from 'lucide-react';
 import { useScrollY } from '../hooks/useScrollY';
 import ThemeToggle from './ThemeToggle';
 import SearchBox from './SearchBox';
+import { getCurrentUser, logout, onAuthChange } from '../utils/auth';
+import { getSavedSlugs, onSavedChange } from '../utils/saved';
 
 const links = [
   { label: 'Explore', to: '/explore' },
@@ -19,6 +21,25 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const searchWrapRef = useRef(null);
+  const navigate = useNavigate();
+  const [user, setUser] = useState(() => getCurrentUser());
+  const [savedCount, setSavedCount] = useState(() => getSavedSlugs().length);
+
+  useEffect(() => {
+    const unsubscribe = onAuthChange(() => setUser(getCurrentUser()));
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = onSavedChange(() => setSavedCount(getSavedSlugs().length));
+    return unsubscribe;
+  }, []);
+
+  function handleLogout() {
+    logout();
+    setMobileOpen(false);
+    navigate('/');
+  }
 
   useEffect(() => {
     function onClickOutside(e) {
@@ -93,21 +114,51 @@ export default function Navbar() {
             )}
           </div>
 
+          <Link
+            to="/saved"
+            aria-label={`Saved destinations (${savedCount})`}
+            className="relative hidden h-10 w-10 place-items-center rounded-full border border-(--glass-border) text-(--text-tertiary) transition-colors hover:border-(--border-mid) hover:text-(--text-primary) sm:grid"
+          >
+            <Bookmark size={16} />
+            {savedCount > 0 && (
+              <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-sky-500 px-1 text-[10px] font-bold text-white">
+                {savedCount}
+              </span>
+            )}
+          </Link>
+
           <ThemeToggle />
 
-          <Link
-            to="/login"
-            className="hidden rounded-full border border-(--glass-border) px-5 py-2.5 text-sm font-medium text-(--text-primary) transition-colors hover:border-(--border-mid) sm:block"
-          >
-            Login
-          </Link>
-          <Link
-            to="/signup"
-            className="btn-gradient hidden items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-semibold text-white shadow-[0_0_20px_rgba(59,130,246,0.35)] transition-transform hover:scale-[1.03] sm:flex"
-          >
-            Get Started
-            <span aria-hidden>&rarr;</span>
-          </Link>
+          {user ? (
+            <div className="hidden items-center gap-2 sm:flex">
+              <span className="rounded-full border border-(--glass-border) px-4 py-2.5 text-sm font-medium text-(--text-primary)">
+                Hi, {user.name.split(' ')[0]}
+              </span>
+              <button
+                onClick={handleLogout}
+                aria-label="Log out"
+                className="grid h-10 w-10 place-items-center rounded-full border border-(--glass-border) text-(--text-tertiary) transition-colors hover:border-(--border-mid) hover:text-(--text-primary)"
+              >
+                <LogOut size={15} />
+              </button>
+            </div>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="hidden rounded-full border border-(--glass-border) px-5 py-2.5 text-sm font-medium text-(--text-primary) transition-colors hover:border-(--border-mid) sm:block"
+              >
+                Login
+              </Link>
+              <Link
+                to="/signup"
+                className="btn-gradient hidden items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-semibold text-white shadow-[0_0_20px_rgba(59,130,246,0.35)] transition-transform hover:scale-[1.03] sm:flex"
+              >
+                Get Started
+                <span aria-hidden>&rarr;</span>
+              </Link>
+            </>
+          )}
 
           <button
             aria-label="Toggle menu"
@@ -144,22 +195,51 @@ export default function Navbar() {
                 </NavLink>
               </li>
             ))}
+            <li>
+              <NavLink
+                to="/saved"
+                onClick={() => setMobileOpen(false)}
+                className={({ isActive }) =>
+                  `flex items-center justify-between rounded-xl px-3 py-2.5 transition-colors hover:bg-(--surface-card) hover:text-(--text-primary) ${
+                    isActive ? 'text-(--text-primary)' : ''
+                  }`
+                }
+              >
+                Saved
+                {savedCount > 0 && (
+                  <span className="grid h-5 min-w-5 place-items-center rounded-full bg-sky-500 px-1 text-[10px] font-bold text-white">
+                    {savedCount}
+                  </span>
+                )}
+              </NavLink>
+            </li>
           </ul>
           <div className="mt-3 flex gap-2 border-t border-(--border-soft) pt-3">
-            <Link
-              to="/login"
-              onClick={() => setMobileOpen(false)}
-              className="flex-1 rounded-xl border border-(--glass-border) px-4 py-2.5 text-center text-sm font-medium text-(--text-primary)"
-            >
-              Login
-            </Link>
-            <Link
-              to="/signup"
-              onClick={() => setMobileOpen(false)}
-              className="btn-gradient flex-1 rounded-xl px-4 py-2.5 text-center text-sm font-semibold text-white"
-            >
-              Get Started
-            </Link>
+            {user ? (
+              <button
+                onClick={handleLogout}
+                className="flex-1 rounded-xl border border-(--glass-border) px-4 py-2.5 text-center text-sm font-medium text-(--text-primary)"
+              >
+                Log out ({user.name.split(' ')[0]})
+              </button>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex-1 rounded-xl border border-(--glass-border) px-4 py-2.5 text-center text-sm font-medium text-(--text-primary)"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/signup"
+                  onClick={() => setMobileOpen(false)}
+                  className="btn-gradient flex-1 rounded-xl px-4 py-2.5 text-center text-sm font-semibold text-white"
+                >
+                  Get Started
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}

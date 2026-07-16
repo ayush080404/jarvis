@@ -32,6 +32,7 @@ const germany = {
   ],
   accentColor: "#c47a3d",
   idealStay: "6–8 days",
+  themes: ["culture", "food-nightlife"],
   language: "German",
   nearestAirport: "Frankfurt Airport (FRA) or Munich Airport (MUC)",
   visaNote: "Schengen Area — many nationalities can visit visa-free for short stays",

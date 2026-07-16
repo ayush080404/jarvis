@@ -13,28 +13,46 @@ const REGION_COUNTS = REGIONS.reduce((acc, r) => {
   return acc;
 }, {});
 
+const THEME_LABELS = {
+  culture: 'Culture & History',
+  nature: 'Nature & Adventure',
+  'food-nightlife': 'Food & Nightlife',
+};
+
 export default function DestinationsPage() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const initialRegion = searchParams.get('region');
+  const initialTheme = searchParams.get('theme');
   const [region, setRegion] = useState(
     initialRegion && REGIONS.includes(initialRegion) ? initialRegion : 'All'
+  );
+  const [theme, setTheme] = useState(
+    initialTheme && THEME_LABELS[initialTheme] ? initialTheme : null
   );
   const [query, setQuery] = useState('');
   const navigate = useNavigate();
   const gridTopRef = useRef(null);
   const scrollY = useScrollY();
 
+  function clearTheme() {
+    setTheme(null);
+    const next = new URLSearchParams(searchParams);
+    next.delete('theme');
+    setSearchParams(next, { replace: true });
+  }
+
   const filtered = useMemo(() => {
-    const byRegion = region === 'All' ? destinations : destinations.filter((d) => d.country === region);
+    let list = region === 'All' ? destinations : destinations.filter((d) => d.country === region);
+    if (theme) list = list.filter((d) => d.themes?.includes(theme));
     const q = query.trim().toLowerCase();
-    if (!q) return byRegion;
-    return byRegion.filter(
+    if (!q) return list;
+    return list.filter(
       (d) =>
         d.name.toLowerCase().includes(q) ||
         d.tag.toLowerCase().includes(q) ||
         d.country.toLowerCase().includes(q)
     );
-  }, [region, query]);
+  }, [region, theme, query]);
 
   function surpriseMe() {
     const pick = destinations[Math.floor(Math.random() * destinations.length)];
@@ -108,10 +126,21 @@ export default function DestinationsPage() {
       </div>
 
       <section ref={gridTopRef} className="mx-auto max-w-6xl px-6 pb-24 pt-8 lg:px-10">
-        <p className="mb-5 text-sm text-(--text-secondary)">
-          {filtered.length} destination{filtered.length === 1 ? '' : 's'}
-          {query.trim() ? ` matching "${query.trim()}"` : ''}
-        </p>
+        <div className="mb-5 flex flex-wrap items-center gap-3">
+          <p className="text-sm text-(--text-secondary)">
+            {filtered.length} destination{filtered.length === 1 ? '' : 's'}
+            {query.trim() ? ` matching "${query.trim()}"` : ''}
+          </p>
+          {theme && (
+            <button
+              onClick={clearTheme}
+              className="inline-flex items-center gap-1.5 rounded-full border border-(--border-mid) bg-(--surface-card-hover) px-3 py-1 text-xs font-medium text-(--text-primary)"
+            >
+              {THEME_LABELS[theme]}
+              <X size={12} />
+            </button>
+          )}
+        </div>
 
         {filtered.length > 0 ? (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">

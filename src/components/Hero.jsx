@@ -1,13 +1,22 @@
 import { Link } from 'react-router-dom';
-import { Mic, Compass, BookMarked, Users2, Globe } from 'lucide-react';
+import { Mic, Compass, BookMarked, MapPinned, Globe } from 'lucide-react';
 import Globe3D from './Globe3D';
 import MountainsSilhouette from './MountainsSilhouette';
 import SearchBox from './SearchBox';
+import { destinations } from '../data/destinations';
 
+const regionCount = new Set(destinations.map((d) => d.country)).size;
+const spotCount = destinations.reduce(
+  (sum, d) => sum + (d.placesToVisit?.length || d.highlights?.length || 0),
+  0
+);
+
+// Real counts derived from the destination data, not placeholder marketing
+// numbers — these update automatically as more destinations/places are added.
 const stats = [
-  { icon: Globe, value: '195+', label: 'Countries' },
-  { icon: BookMarked, value: '20K+', label: 'Travel Guides' },
-  { icon: Users2, value: '100K+', label: 'Travelers' },
+  { icon: Globe, value: `${destinations.length}`, label: 'Destinations' },
+  { icon: MapPinned, value: `${spotCount}+`, label: 'Places to Explore' },
+  { icon: BookMarked, value: `${regionCount}`, label: 'Regions Covered' },
 ];
 
 export default function Hero() {

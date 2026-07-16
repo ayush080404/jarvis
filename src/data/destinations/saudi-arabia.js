@@ -31,6 +31,7 @@ const saudi_arabia = {
   ],
   accentColor: "#c96a4d",
   idealStay: "5–7 days",
+  themes: ["culture", "nature"],
   language: "Arabic",
   nearestAirport: "King Khalid Intl, Riyadh (RUH) or King Abdulaziz Intl, Jeddah (JED)",
   visaNote: "E-visa available for many nationalities",

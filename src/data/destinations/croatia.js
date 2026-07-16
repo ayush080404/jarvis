@@ -31,6 +31,7 @@ const croatia = {
   ],
   accentColor: "#2f8fd0",
   idealStay: "6–8 days",
+  themes: ["nature", "culture"],
   language: "Croatian",
   nearestAirport: "Dubrovnik Airport (DBV) or Zagreb Airport (ZAG)",
   visaNote: "Schengen Area — many nationalities can visit visa-free for short stays",

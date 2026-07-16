@@ -29,6 +29,7 @@ const dubai = {
   ],
   accentColor: "#d9a441",
   idealStay: "4–6 days",
+  themes: ["culture", "food-nightlife"],
   language: "Arabic (English widely spoken)",
   nearestAirport: "Dubai International Airport (DXB)",
   visaNote: "Visa on arrival or e-visa for many nationalities",

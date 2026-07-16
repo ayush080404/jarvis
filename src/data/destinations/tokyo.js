@@ -32,6 +32,7 @@ const tokyo = {
   ],
   accentColor: "#e8748c",
   idealStay: "7–10 days",
+  themes: ["culture", "food-nightlife"],
   language: "Japanese",
   nearestAirport: "Narita (NRT) or Haneda (HND)",
   visaNote: "Visa-free for many nationalities for stays up to 90 days",

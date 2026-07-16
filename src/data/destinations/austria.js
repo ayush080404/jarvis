@@ -34,6 +34,7 @@ const austria = {
   ],
   accentColor: "#3f8f7a",
   idealStay: "6–8 days",
+  themes: ["nature", "culture"],
   language: "German",
   nearestAirport: "Vienna International Airport (VIE)",
   visaNote: "Schengen Area — many nationalities can visit visa-free for short stays",

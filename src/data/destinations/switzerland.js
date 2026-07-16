@@ -32,6 +32,7 @@ const switzerland = {
   ],
   accentColor: "#4a8fd6",
   idealStay: "5–7 days",
+  themes: ["nature"],
   language: "German, French, Italian, Romansh",
   nearestAirport: "Zurich Airport (ZRH) or Geneva Airport (GVA)",
   visaNote: "Schengen Area — many nationalities can visit visa-free for short stays",

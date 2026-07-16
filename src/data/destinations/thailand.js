@@ -32,6 +32,7 @@ const thailand = {
   ],
   accentColor: "#22b3a6",
   idealStay: "7–10 days",
+  themes: ["culture", "nature"],
   language: "Thai",
   nearestAirport: "Suvarnabhumi Airport, Bangkok (BKK)",
   visaNote: "Visa exemption for many nationalities for stays up to 30–60 days",

@@ -31,6 +31,7 @@ const mexico = {
   ],
   accentColor: "#e0538a",
   idealStay: "7–10 days",
+  themes: ["culture", "nature"],
   language: "Spanish",
   nearestAirport: "Mexico City Intl (MEX) or Cancún Intl (CUN)",
   visaNote: "Visa-free for many nationalities for stays up to 180 days",

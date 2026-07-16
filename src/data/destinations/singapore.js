@@ -32,6 +32,7 @@ const singapore = {
   ],
   accentColor: "#3fae6a",
   idealStay: "3–4 days",
+  themes: ["food-nightlife", "culture"],
   language: "English, Mandarin, Malay, Tamil",
   nearestAirport: "Changi Airport (SIN)",
   visaNote: "Visa-free for many nationalities for stays up to 30–90 days",

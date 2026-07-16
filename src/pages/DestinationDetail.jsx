@@ -19,16 +19,7 @@ import {
 } from 'lucide-react';
 import { destinations, getDestinationBySlug } from '../data/destinations';
 import DestinationCard from '../components/DestinationCard';
-
-const SAVED_KEY = 'voyora:saved-destinations';
-
-function readSaved() {
-  try {
-    return JSON.parse(localStorage.getItem(SAVED_KEY) || '[]');
-  } catch {
-    return [];
-  }
-}
+import { isSaved, toggleSaved } from '../utils/saved';
 
 export default function DestinationDetail() {
   const { slug } = useParams();
@@ -41,7 +32,7 @@ export default function DestinationDetail() {
 
   useEffect(() => {
     if (!slug) return;
-    setSaved(readSaved().includes(slug));
+    setSaved(isSaved(slug));
   }, [slug]);
 
   const navItems = useMemo(() => {
@@ -117,13 +108,8 @@ export default function DestinationDetail() {
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  function toggleSaved() {
-    const current = readSaved();
-    const next = current.includes(slug)
-      ? current.filter((s) => s !== slug)
-      : [...current, slug];
-    localStorage.setItem(SAVED_KEY, JSON.stringify(next));
-    setSaved(next.includes(slug));
+  function handleToggleSaved() {
+    setSaved(toggleSaved(slug));
   }
 
   async function handleShare() {
@@ -212,7 +198,7 @@ export default function DestinationDetail() {
 
             <div className="flex items-center gap-2">
               <button
-                onClick={toggleSaved}
+                onClick={handleToggleSaved}
                 aria-label={saved ? 'Remove from saved' : 'Save destination'}
                 className="grid h-9 w-9 place-items-center rounded-full border border-white/25 bg-black/20 text-white backdrop-blur transition-colors hover:bg-black/35"
               >

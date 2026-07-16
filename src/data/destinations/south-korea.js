@@ -32,6 +32,7 @@ const south_korea = {
   ],
   accentColor: "#6a7fd6",
   idealStay: "6–8 days",
+  themes: ["culture", "food-nightlife"],
   language: "Korean",
   nearestAirport: "Incheon International Airport (ICN)",
   visaNote: "Visa-free for many nationalities for stays up to 90 days; K-ETA required for some",

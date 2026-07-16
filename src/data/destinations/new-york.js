@@ -31,6 +31,7 @@ const new_york = {
   ],
   accentColor: "#4a6fa5",
   idealStay: "4–6 days",
+  themes: ["culture", "food-nightlife"],
   language: "English",
   nearestAirport: "John F. Kennedy Intl (JFK), Newark (EWR), or LaGuardia (LGA)",
   visaNote: "ESTA (Visa Waiver Program) for eligible nationalities; visa required otherwise",

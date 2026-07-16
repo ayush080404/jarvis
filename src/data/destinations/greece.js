@@ -31,6 +31,7 @@ const greece = {
   ],
   accentColor: "#2f7fd0",
   idealStay: "7–10 days",
+  themes: ["culture", "nature"],
   language: "Greek",
   nearestAirport: "Athens International Airport (ATH)",
   visaNote: "Schengen Area — many nationalities can visit visa-free for short stays",

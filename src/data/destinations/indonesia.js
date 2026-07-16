@@ -31,6 +31,7 @@ const indonesia = {
   ],
   accentColor: "#d9a441",
   idealStay: "7–10 days",
+  themes: ["nature", "culture"],
   language: "Indonesian",
   nearestAirport: "Ngurah Rai Intl, Bali (DPS)",
   visaNote: "Visa on arrival for many nationalities, typically around 30 days",

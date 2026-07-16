@@ -31,6 +31,7 @@ const turkiye = {
   ],
   accentColor: "#e8935a",
   idealStay: "7–9 days",
+  themes: ["culture", "nature"],
   language: "Turkish",
   nearestAirport: "Istanbul Airport (IST)",
   visaNote: "E-visa required for many nationalities",

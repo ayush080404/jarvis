@@ -7,8 +7,10 @@ import DestinationDetail from './pages/DestinationDetail';
 import TripPlanner from './pages/TripPlanner';
 import AIGuide from './pages/AIGuide';
 import TravelBlog from './pages/TravelBlog';
+import BlogPostDetail from './pages/BlogPostDetail';
 import ExploreCountries from './pages/ExploreCountries';
 import PlanMyTrip from './pages/PlanMyTrip';
+import SavedDestinations from './pages/SavedDestinations';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import NotFound from './pages/NotFound';
@@ -26,8 +28,10 @@ export default function App() {
         <Route path="trip-planner" element={<TripPlanner />} />
         <Route path="ai-guide" element={<AIGuide />} />
         <Route path="travel-blog" element={<TravelBlog />} />
+        <Route path="travel-blog/:slug" element={<BlogPostDetail />} />
         <Route path="explore-countries" element={<ExploreCountries />} />
         <Route path="plan-my-trip" element={<PlanMyTrip />} />
+        <Route path="saved" element={<SavedDestinations />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

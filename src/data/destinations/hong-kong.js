@@ -31,6 +31,7 @@ const hong_kong = {
   ],
   accentColor: "#5a6fd6",
   idealStay: "3–4 days",
+  themes: ["food-nightlife", "culture"],
   language: "Cantonese, English",
   nearestAirport: "Hong Kong International Airport (HKG)",
   visaNote: "Visa-free for many nationalities for stays up to 90 days",

@@ -31,6 +31,7 @@ const portugal = {
   ],
   accentColor: "#2e9e8f",
   idealStay: "6–8 days",
+  themes: ["culture", "food-nightlife"],
   language: "Portuguese",
   nearestAirport: "Lisbon Humberto Delgado Airport (LIS)",
   visaNote: "Schengen Area — many nationalities can visit visa-free for short stays",

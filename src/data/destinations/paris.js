@@ -38,6 +38,7 @@ const paris = {
   ],
   accentColor: "#c9a15a",
   idealStay: "4–6 days",
+  themes: ["culture", "food-nightlife"],
   language: "French",
   nearestAirport: "Paris Charles de Gaulle (CDG)",
   visaNote: "Schengen Area — many nationalities can visit visa-free for short stays",

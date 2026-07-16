@@ -31,6 +31,7 @@ const united_kingdom = {
   ],
   accentColor: "#445a8a",
   idealStay: "6–8 days",
+  themes: ["culture", "food-nightlife"],
   language: "English",
   nearestAirport: "London Heathrow Airport (LHR)",
   visaNote: "Visa-free for many nationalities for stays up to 6 months; ETA required for some",

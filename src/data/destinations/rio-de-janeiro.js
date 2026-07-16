@@ -31,6 +31,7 @@ const rio_de_janeiro = {
   ],
   accentColor: "#37b34a",
   idealStay: "4–6 days",
+  themes: ["nature", "food-nightlife"],
   language: "Portuguese",
   nearestAirport: "Rio de Janeiro–Galeão Intl (GIG)",
   visaNote: "Visa-free for many nationalities for stays up to 90 days",

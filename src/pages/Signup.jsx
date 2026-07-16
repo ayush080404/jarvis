@@ -1,6 +1,8 @@
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Lock } from 'lucide-react';
 import AuthLayout from '../components/AuthLayout';
+import { signup } from '../utils/auth';
 
 function Mosaic() {
   return (
@@ -30,6 +32,22 @@ function Mosaic() {
 }
 
 export default function Signup() {
+  const navigate = useNavigate();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    const result = signup({ name, email, password });
+    if (result.error) {
+      setError(result.error);
+      return;
+    }
+    navigate('/');
+  }
+
   return (
     <AuthLayout
       eyebrow="Start your journey"
@@ -45,7 +63,7 @@ export default function Signup() {
         </Link>
       </p>
 
-      <form className="mt-8 space-y-4">
+      <form onSubmit={handleSubmit} className="mt-8 space-y-4">
         <div>
           <label className="mb-1.5 block text-sm font-medium text-(--text-secondary)">
             Full name
@@ -54,6 +72,8 @@ export default function Signup() {
             <User size={16} className="shrink-0 text-(--text-secondary)" />
             <input
               type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               placeholder="Jane Traveler"
               className="w-full bg-transparent text-sm text-(--text-primary) placeholder:text-(--text-secondary) focus:outline-none"
             />
@@ -68,6 +88,8 @@ export default function Signup() {
             <Mail size={16} className="shrink-0 text-(--text-secondary)" />
             <input
               type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               className="w-full bg-transparent text-sm text-(--text-primary) placeholder:text-(--text-secondary) focus:outline-none"
             />
@@ -82,18 +104,26 @@ export default function Signup() {
             <Lock size={16} className="shrink-0 text-(--text-secondary)" />
             <input
               type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="Create a password"
               className="w-full bg-transparent text-sm text-(--text-primary) placeholder:text-(--text-secondary) focus:outline-none"
             />
           </div>
         </div>
 
+        {error && <p className="text-sm text-rose-500">{error}</p>}
+
         <button
-          type="button"
+          type="submit"
           className="btn-gradient w-full rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-[0_0_25px_rgba(59,130,246,0.35)] transition-transform hover:scale-[1.01]"
         >
           Create account
         </button>
+
+        <p className="text-center text-xs text-(--text-secondary)">
+          Accounts are stored only in this browser for now — there&apos;s no real backend yet.
+        </p>
       </form>
 
       <p className="mt-6 text-center text-xs text-(--text-secondary)">

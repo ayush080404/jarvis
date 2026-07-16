@@ -1,0 +1,63 @@
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Bookmark, X, Compass } from 'lucide-react';
+import PageHeader from '../components/PageHeader';
+import DestinationCard from '../components/DestinationCard';
+import { destinations } from '../data/destinations';
+import { getSavedSlugs, removeSaved, onSavedChange } from '../utils/saved';
+
+export default function SavedDestinations() {
+  const [slugs, setSlugs] = useState(() => getSavedSlugs());
+
+  useEffect(() => {
+    const unsubscribe = onSavedChange(() => setSlugs(getSavedSlugs()));
+    return unsubscribe;
+  }, []);
+
+  const saved = slugs
+    .map((slug) => destinations.find((d) => d.slug === slug))
+    .filter(Boolean);
+
+  return (
+    <>
+      <PageHeader
+        icon={Bookmark}
+        eyebrow={`${saved.length} saved`}
+        title="Your saved destinations"
+        subtitle="Everything you've bookmarked, kept in this browser so you can pick up planning anytime."
+      />
+      <section className="mx-auto max-w-6xl px-6 pb-24 lg:px-10">
+        {saved.length > 0 ? (
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {saved.map((d) => (
+              <div key={d.slug} className="relative">
+                <button
+                  onClick={() => removeSaved(d.slug)}
+                  aria-label={`Remove ${d.name} from saved`}
+                  className="absolute right-3 top-3 z-10 grid h-8 w-8 place-items-center rounded-full border border-white/25 bg-black/40 text-white backdrop-blur transition-colors hover:bg-black/60"
+                >
+                  <X size={14} />
+                </button>
+                <DestinationCard destination={d} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-(--border-soft) bg-(--surface-card) p-10 text-center">
+            <p className="text-(--text-primary)">Nothing saved yet.</p>
+            <p className="mt-1.5 text-sm text-(--text-secondary)">
+              Tap the bookmark icon on any destination page to keep it here.
+            </p>
+            <Link
+              to="/destinations"
+              className="btn-gradient mt-5 inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white"
+            >
+              <Compass size={15} />
+              Browse destinations
+            </Link>
+          </div>
+        )}
+      </section>
+    </>
+  );
+}

@@ -34,6 +34,7 @@ const spain = {
   ],
   accentColor: "#e07856",
   idealStay: "7–10 days",
+  themes: ["culture", "food-nightlife"],
   language: "Spanish",
   nearestAirport: "Madrid–Barajas (MAD) or Barcelona–El Prat (BCN)",
   visaNote: "Schengen Area — many nationalities can visit visa-free for short stays",
