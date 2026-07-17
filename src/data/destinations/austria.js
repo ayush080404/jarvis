@@ -88,7 +88,7 @@ const austria = {
     },
     {
       name: "Grossglockner High Alpine Road",
-      image: "/images/gloss.jpg",
+      image: "/images/gloss.jpg", 
       points: [
         "One of Europe's most scenic drives",
         "Stunning mountain panoramas",
