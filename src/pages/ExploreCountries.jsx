@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Globe as GlobeIcon } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { destinations } from '../data/destinations';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 const regionCounts = destinations.reduce((acc, d) => {
   acc[d.country] = (acc[d.country] || 0) + 1;
@@ -13,6 +14,7 @@ const regions = Object.entries(regionCounts)
   .sort((a, b) => b.count - a.count);
 
 export default function ExploreCountries() {
+  usePageTitle('Explore Countries');
   return (
     <>
       <PageHeader

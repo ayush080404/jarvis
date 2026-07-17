@@ -92,6 +92,34 @@ html[data-theme='light'] {
   --mountain-near: #9db8da;
 }
 
+/* Custom scrollbar — thin and tinted to match the theme, instead of the
+   default browser scrollbar, in both dark and light mode. */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-mid) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--border-mid);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-nebula-blue);
+  background-clip: content-box;
+}
+
 body {
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
@@ -142,8 +170,51 @@ h1, h2, h3, h4 {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .starfield, .animate-orbit, .animate-float {
+  .starfield, .animate-orbit, .animate-float, .page-transition {
     animation: none !important;
+  }
+}
+
+/* Page transition: a soft fade + rise on every route change (keyed by
+   pathname in Layout.jsx) so navigating never feels like a hard cut. */
+.page-transition {
+  animation: page-fade-in 0.4s ease both;
+}
+
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Subtle film-grain overlay — adds depth to flat dark backgrounds without
+   being consciously noticeable. Applied site-wide via body::after so it
+   sits above every page but below actual content (z-index stacking handled
+   by pointer-events: none + fixed positioning at the very end of paint). */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* mix-blend-mode forces the browser to recomposite this full-viewport layer
+   against everything beneath it — cheap on desktop, but a real cost on
+   mobile GPUs, most noticeable exactly when many colors change at once
+   (like a dark/light theme switch). The grain is a subtle desktop touch,
+   not worth that cost on mobile, so it's disabled below 768px. */
+@media (max-width: 768px) {
+  body::after {
+    display: none;
   }
 }
 

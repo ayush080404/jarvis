@@ -20,10 +20,12 @@ import {
 import { destinations, getDestinationBySlug } from '../data/destinations';
 import DestinationCard from '../components/DestinationCard';
 import { isSaved, toggleSaved } from '../utils/saved';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 export default function DestinationDetail() {
   const { slug } = useParams();
   const destination = getDestinationBySlug(slug);
+  usePageTitle(destination?.name);
 
   const [saved, setSaved] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);

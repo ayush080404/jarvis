@@ -31,7 +31,9 @@ export default function Layout() {
       style={{ backgroundColor: bgColor }}
     >
       <Navbar />
-      <Outlet />
+      <main key={pathname} className="page-transition">
+        <Outlet />
+      </main>
       <Footer />
     </div>
   );

@@ -1,10 +1,12 @@
 import { Link, useParams, Navigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { getPostBySlug } from '../data/blogPosts';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 export default function BlogPostDetail() {
   const { slug } = useParams();
   const post = getPostBySlug(slug);
+  usePageTitle(post?.title);
 
   if (!post) return <Navigate to="/travel-blog" replace />;
 

@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom';
 import { Compass } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 export default function NotFound() {
+  usePageTitle('Page Not Found');
   return (
     <>
       <PageHeader

@@ -2,8 +2,10 @@ import { Link } from 'react-router-dom';
 import { Newspaper, ArrowRight } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import blogPosts from '../data/blogPosts';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 export default function TravelBlog() {
+  usePageTitle('Travel Blog');
   return (
     <>
       <PageHeader

@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowUp, Globe, Search, SearchX, Shuffle, X } from 'lucide-react';
 import { useScrollY } from '../hooks/useScrollY';
+import { usePageTitle } from '../hooks/usePageTitle';
 import PageHeader from '../components/PageHeader';
 import DestinationCard from '../components/DestinationCard';
 import EmptyState from '../components/EmptyState';
@@ -21,6 +22,7 @@ const THEME_LABELS = {
 };
 
 export default function DestinationsPage() {
+  usePageTitle('Destinations');
   const [searchParams, setSearchParams] = useSearchParams();
   const initialRegion = searchParams.get('region');
   const initialTheme = searchParams.get('theme');

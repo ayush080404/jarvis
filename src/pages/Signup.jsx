@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Lock } from 'lucide-react';
 import AuthLayout from '../components/AuthLayout';
 import { signup } from '../utils/auth';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 function Mosaic() {
   return (
@@ -32,6 +33,7 @@ function Mosaic() {
 }
 
 export default function Signup() {
+  usePageTitle('Sign Up');
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');

@@ -3,8 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import AuthLayout from '../components/AuthLayout';
 import { login } from '../utils/auth';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 export default function Login() {
+  usePageTitle('Log In');
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Compass, Mountain, Utensils, Landmark } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { destinations } from '../data/destinations';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 const categories = [
   {
@@ -29,6 +30,7 @@ function countFor(theme) {
 }
 
 export default function Explore() {
+  usePageTitle('Explore');
   return (
     <>
       <PageHeader

@@ -31,8 +31,12 @@ export default function ItineraryResult({ itinerary }) {
       </p>
 
       <div className="mt-5 space-y-3">
-        {days.map((d) => (
-          <div key={d.day} className="flex gap-3 rounded-xl border border-(--border-soft) p-4">
+        {days.map((d, i) => (
+          <div
+            key={d.day}
+            className="page-transition flex gap-3 rounded-xl border border-(--border-soft) p-4"
+            style={{ animationDelay: `${i * 70}ms` }}
+          >
             <span
               className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-xs font-bold"
               style={{ backgroundColor: `${accentColor}25`, color: accentColor }}

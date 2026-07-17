@@ -1,9 +1,17 @@
+import { lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { Mic, Compass, BookMarked, MapPinned, Globe } from 'lucide-react';
-import Globe3D from './Globe3D';
 import MountainsSilhouette from './MountainsSilhouette';
 import SearchBox from './SearchBox';
 import { destinations } from '../data/destinations';
+import { useCountUp } from '../hooks/useCountUp';
+
+// Three.js + @react-three/fiber + @react-three/drei are heavy (they were
+// the single biggest contributor to the initial bundle — ~370kB gzipped).
+// Home is the one page that stays eagerly loaded for instant first paint,
+// so the globe itself is lazy-loaded instead: the hero text, stats, and
+// search render immediately, and the globe streams in a beat later.
+const Globe3D = lazy(() => import('./Globe3D'));
 
 const regionCount = new Set(destinations.map((d) => d.country)).size;
 const spotCount = destinations.reduce(
@@ -14,9 +22,9 @@ const spotCount = destinations.reduce(
 // Real counts derived from the destination data, not placeholder marketing
 // numbers — these update automatically as more destinations/places are added.
 const stats = [
-  { icon: Globe, value: `${destinations.length}`, label: 'Destinations' },
-  { icon: MapPinned, value: `${spotCount}+`, label: 'Places to Explore' },
-  { icon: BookMarked, value: `${regionCount}`, label: 'Regions Covered' },
+  { icon: Globe, target: destinations.length, suffix: '', label: 'Destinations' },
+  { icon: MapPinned, target: spotCount, suffix: '+', label: 'Places to Explore' },
+  { icon: BookMarked, target: regionCount, suffix: '', label: 'Regions Covered' },
 ];
 
 export default function Hero() {
@@ -75,26 +83,18 @@ export default function Hero() {
             </Link>
           </div>
 
-          <div className="mt-10 grid max-w-lg grid-cols-3 gap-4 rounded-2xl border border-(--border-soft) bg-(--surface-card) p-5">
-            {stats.map(({ icon: Icon, value, label }) => (
-              <div key={label} className="flex items-center gap-3">
-                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-blue-500/25 to-violet-500/25 text-sky-400">
-                  <Icon size={18} />
-                </span>
-                <div>
-                  <p className="font-display text-lg font-bold leading-tight text-(--text-primary)">
-                    {value}
-                  </p>
-                  <p className="text-xs text-(--text-secondary)">{label}</p>
-                </div>
-              </div>
+          <div className="mt-10 grid max-w-lg grid-cols-1 gap-3 rounded-2xl border border-(--border-soft) bg-(--surface-card) p-5 sm:grid-cols-3 sm:gap-4">
+            {stats.map((stat) => (
+              <StatItem key={stat.label} {...stat} />
             ))}
           </div>
         </div>
 
         {/* Right column: real 3D globe */}
         <div className="relative z-10 mx-auto aspect-square w-full max-w-[560px]">
-          <Globe3D />
+          <Suspense fallback={<GlobePlaceholder />}>
+            <Globe3D />
+          </Suspense>
         </div>
       </div>
 
@@ -109,5 +109,36 @@ export default function Hero() {
         </div>
       </div>
     </section>
+  );
+}
+
+function GlobePlaceholder() {
+  return (
+    <div className="flex h-full w-full items-center justify-center">
+      <div
+        className="aspect-square w-4/5 animate-pulse rounded-full border border-(--border-soft)"
+        style={{
+          background: 'radial-gradient(circle at 35% 30%, rgba(56,132,255,0.25), transparent 60%)',
+        }}
+      />
+    </div>
+  );
+}
+
+function StatItem({ icon: Icon, target, suffix, label }) {
+  const [ref, value] = useCountUp(target);
+  return (
+    <div ref={ref} className="flex items-center gap-3">
+      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-blue-500/25 to-violet-500/25 text-sky-400">
+        <Icon size={18} />
+      </span>
+      <div>
+        <p className="font-display text-lg font-bold leading-tight text-(--text-primary)">
+          {value}
+          {suffix}
+        </p>
+        <p className="text-xs text-(--text-secondary)">{label}</p>
+      </div>
+    </div>
   );
 }

@@ -5,8 +5,10 @@ import DestinationCard from '../components/DestinationCard';
 import EmptyState from '../components/EmptyState';
 import { destinations } from '../data/destinations';
 import { getSavedSlugs, removeSaved, onSavedChange } from '../utils/saved';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 export default function SavedDestinations() {
+  usePageTitle('Saved');
   const [slugs, setSlugs] = useState(() => getSavedSlugs());
 
   useEffect(() => {

@@ -1,22 +1,51 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, MapPin, Layers } from 'lucide-react';
 
 export default function DestinationCard({ destination }) {
   const { slug, name, country, tag, heroImage, accentColor, placesToVisit, bestTime } = destination;
+  const [loaded, setLoaded] = useState(false);
+
+  function handleMouseMove(e) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    e.currentTarget.style.setProperty('--mx', `${x}%`);
+    e.currentTarget.style.setProperty('--my', `${y}%`);
+  }
 
   return (
     <Link
       to={`/destinations/${slug}`}
+      onMouseMove={handleMouseMove}
       className="group relative overflow-hidden rounded-2xl border border-(--border-soft) bg-(--surface-card) transition-colors hover:border-(--border-mid) hover:bg-(--surface-card-hover)"
     >
+      {/* Cursor-reactive glow — tracks the mouse via --mx/--my set on
+          mousemove above, only visible on hover (opacity 0 -> 1). */}
+      <div
+        className="pointer-events-none absolute inset-0 z-10 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        style={{
+          background: `radial-gradient(220px circle at var(--mx, 50%) var(--my, 50%), ${accentColor}22, transparent 70%)`,
+        }}
+      />
+
       <div className="relative h-36 w-full overflow-hidden">
         {heroImage ? (
-          <img
-            src={heroImage}
-            alt={name}
-            loading="lazy"
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
+          <>
+            <div
+              className="absolute inset-0"
+              style={{ background: `linear-gradient(135deg, ${accentColor}55, ${accentColor}15)` }}
+            />
+            <img
+              src={heroImage}
+              alt={name}
+              loading="lazy"
+              onLoad={() => setLoaded(true)}
+              className={`relative h-full w-full object-cover transition-all duration-500 group-hover:scale-105 ${
+                loaded ? 'opacity-100' : 'opacity-0'
+              }`}
+            />
+          </>
         ) : (
           <div
             className="flex h-full w-full items-center justify-center"

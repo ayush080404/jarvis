@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { CalendarRange, MapPin, Wallet, Check, Search } from 'lucide-react';
+import { CalendarRange, MapPin, Wallet, Check, Search, Loader2 } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import ItineraryResult from '../components/ItineraryResult';
 import { destinations } from '../data/destinations';
 import { buildItinerary, TRIP_STYLES } from '../utils/itinerary';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 export default function TripPlanner() {
+  usePageTitle('Trip Planner');
   const [searchParams] = useSearchParams();
   const preselectSlug = searchParams.get('destination');
   const preselected = destinations.find((d) => d.slug === preselectSlug) || null;
@@ -17,6 +19,7 @@ export default function TripPlanner() {
   const [endDate, setEndDate] = useState('');
   const [style, setStyle] = useState('balanced');
   const [itinerary, setItinerary] = useState(null);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   // Coming from a destination page's "Plan a trip to X" button — arrives as
   // /trip-planner?destination=slug, so step 1 is already filled in.
@@ -42,9 +45,18 @@ export default function TripPlanner() {
   }
 
   function generate() {
-    if (!selectedDestination) return;
-    const result = buildItinerary(selectedDestination, { startDate, endDate, style });
-    setItinerary(result);
+    if (!selectedDestination || isGenerating) return;
+    setIsGenerating(true);
+    setItinerary(null);
+    // A short, honest processing beat — buildItinerary() itself is instant
+    // (it's just formatting data already on the page), but showing that
+    // briefly makes "Generate" feel like it did real work instead of
+    // snapping into an already-computed answer.
+    window.setTimeout(() => {
+      const result = buildItinerary(selectedDestination, { startDate, endDate, style });
+      setItinerary(result);
+      setIsGenerating(false);
+    }, 650);
   }
 
   return (
@@ -183,13 +195,32 @@ export default function TripPlanner() {
 
         <button
           onClick={generate}
-          disabled={!selectedDestination}
-          className="btn-gradient mt-8 w-full rounded-xl px-6 py-3.5 text-sm font-semibold text-white shadow-[0_0_25px_rgba(59,130,246,0.35)] transition-transform hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100 sm:w-auto"
+          disabled={!selectedDestination || isGenerating}
+          className="btn-gradient mt-8 flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-sm font-semibold text-white shadow-[0_0_25px_rgba(59,130,246,0.35)] transition-transform hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100 sm:w-auto"
         >
-          Generate my itinerary
+          {isGenerating ? (
+            <>
+              <Loader2 size={16} className="animate-spin" />
+              Generating...
+            </>
+          ) : (
+            'Generate my itinerary'
+          )}
         </button>
 
-        <ItineraryResult itinerary={itinerary} />
+        {isGenerating && (
+          <div className="mt-8 animate-pulse rounded-3xl border border-(--border-soft) bg-(--surface-card) p-6">
+            <div className="h-3 w-28 rounded bg-(--surface-card-hover)" />
+            <div className="mt-3 h-6 w-56 rounded bg-(--surface-card-hover)" />
+            <div className="mt-6 space-y-3">
+              <div className="h-14 rounded-xl bg-(--surface-card-hover)" />
+              <div className="h-14 rounded-xl bg-(--surface-card-hover)" />
+              <div className="h-14 rounded-xl bg-(--surface-card-hover)" />
+            </div>
+          </div>
+        )}
+
+        {!isGenerating && <ItineraryResult itinerary={itinerary} />}
       </section>
     </>
   );
