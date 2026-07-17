@@ -31,7 +31,7 @@ const canada = {
   ],
   accentColor: "#3fb0c9",
   idealStay: "7–10 days",
-  themes: ["nature"],
+  themes: ["mountains"],
   language: "English, French",
   nearestAirport: "Toronto Pearson (YYZ) or Vancouver International (YVR)",
   visaNote: "eTA required for visa-exempt air travelers",

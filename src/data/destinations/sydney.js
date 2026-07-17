@@ -30,7 +30,7 @@ const sydney = {
   ],
   accentColor: "#2fb8c6",
   idealStay: "5–7 days",
-  themes: ["nature", "food-nightlife"],
+  themes: ["beaches", "food-nightlife"],
   language: "English",
   nearestAirport: "Sydney Kingsford Smith Airport (SYD)",
   visaNote: "ETA or eVisitor visa required for most visitors before arrival",

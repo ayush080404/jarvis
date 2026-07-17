@@ -17,7 +17,8 @@ const REGION_COUNTS = REGIONS.reduce((acc, r) => {
 
 const THEME_LABELS = {
   culture: 'Culture & History',
-  nature: 'Nature & Adventure',
+  beaches: 'Beaches & Islands',
+  mountains: 'Mountains & Adventure',
   'food-nightlife': 'Food & Nightlife',
 };
 

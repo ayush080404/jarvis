@@ -31,7 +31,7 @@ const morocco = {
   ],
   accentColor: "#3f7fd6",
   idealStay: "7–9 days",
-  themes: ["culture", "nature"],
+  themes: ["culture", "mountains"],
   language: "Arabic, Berber (French widely spoken)",
   nearestAirport: "Marrakesh Menara (RAK) or Casablanca Mohammed V (CMN)",
   visaNote: "Visa-free for many nationalities for stays up to 90 days",

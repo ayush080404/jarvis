@@ -31,7 +31,7 @@ const malaysia = {
   ],
   accentColor: "#d9a441",
   idealStay: "6–8 days",
-  themes: ["culture", "nature"],
+  themes: ["beaches", "culture"],
   language: "Malay (English widely spoken)",
   nearestAirport: "Kuala Lumpur International Airport (KUL)",
   visaNote: "Visa-free for many nationalities for stays up to 90 days",

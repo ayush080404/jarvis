@@ -31,7 +31,7 @@ const india = {
   ],
   accentColor: "#e08a3c",
   idealStay: "10–14 days",
-  themes: ["culture", "nature"],
+  themes: ["culture", "mountains"],
   language: "Hindi, English, and 20+ regional languages",
   nearestAirport: "Indira Gandhi Intl, Delhi (DEL) or Chhatrapati Shivaji Intl, Mumbai (BOM)",
   visaNote: "E-visa required for most foreign visitors",

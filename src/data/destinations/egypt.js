@@ -31,7 +31,7 @@ const egypt = {
   ],
   accentColor: "#d9954a",
   idealStay: "7–9 days",
-  themes: ["culture", "nature"],
+  themes: ["culture", "beaches"],
   language: "Arabic",
   nearestAirport: "Cairo International Airport (CAI)",
   visaNote: "E-visa or visa on arrival for many nationalities",

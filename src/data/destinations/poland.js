@@ -31,7 +31,7 @@ const poland = {
   ],
   accentColor: "#c48a4d",
   idealStay: "5–7 days",
-  themes: ["culture", "nature"],
+  themes: ["culture", "mountains"],
   language: "Polish",
   nearestAirport: "Warsaw Chopin Airport (WAW) or Kraków Airport (KRK)",
   visaNote: "Schengen Area — many nationalities can visit visa-free for short stays",

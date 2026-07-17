@@ -125,7 +125,7 @@ export default function SearchBox({
         <div
           id="site-search-results"
           role="listbox"
-          className="liquid-glass absolute left-0 right-0 top-full z-30 mt-2 max-h-96 overflow-y-auto rounded-2xl p-2"
+          className="liquid-glass liquid-glass--dense absolute left-0 right-0 top-full z-30 mt-2 max-h-96 overflow-y-auto rounded-2xl p-2"
         >
           {matches.length > 0 ? (
             <ul>

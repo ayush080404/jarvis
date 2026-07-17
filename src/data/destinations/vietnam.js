@@ -32,7 +32,7 @@ const vietnam = {
   ],
   accentColor: "#1fa392",
   idealStay: "7–10 days",
-  themes: ["nature", "food-nightlife"],
+  themes: ["beaches", "food-nightlife"],
   language: "Vietnamese",
   nearestAirport: "Noi Bai Intl, Hanoi (HAN) or Tan Son Nhat, Ho Chi Minh City (SGN)",
   visaNote: "E-visa required for most foreign visitors",

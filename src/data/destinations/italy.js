@@ -31,7 +31,7 @@ const italy = {
   ],
   accentColor: "#4fa8d8",
   idealStay: "7–10 days",
-  themes: ["culture", "food-nightlife"],
+  themes: ["culture", "beaches"],
   language: "Italian",
   nearestAirport: "Rome Fiumicino (FCO) or Milan Malpensa (MXP)",
   visaNote: "Schengen Area — many nationalities can visit visa-free for short stays",

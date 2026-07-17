@@ -31,7 +31,7 @@ const ireland = {
   ],
   accentColor: "#2f9e5a",
   idealStay: "6–8 days",
-  themes: ["nature", "culture"],
+  themes: ["culture", "mountains"],
   language: "English (Irish also official)",
   nearestAirport: "Dublin Airport (DUB)",
   visaNote: "Visa-free for many nationalities for stays up to 90 days",

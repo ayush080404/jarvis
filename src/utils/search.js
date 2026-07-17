@@ -3,7 +3,8 @@ import blogPosts from '../data/blogPosts';
 
 const THEME_ENTRIES = [
   { theme: 'culture', label: 'Culture & History', desc: 'Browse by theme' },
-  { theme: 'nature', label: 'Nature & Adventure', desc: 'Browse by theme' },
+  { theme: 'beaches', label: 'Beaches & Islands', desc: 'Browse by theme' },
+  { theme: 'mountains', label: 'Mountains & Adventure', desc: 'Browse by theme' },
   { theme: 'food-nightlife', label: 'Food & Nightlife', desc: 'Browse by theme' },
 ];
 
