@@ -89,7 +89,7 @@ export default function Navbar() {
         </ul>
 
         <div className="relative z-10 flex items-center gap-2.5 sm:gap-3">
-          <div ref={searchWrapRef} className="relative hidden sm:block">
+          <div ref={searchWrapRef} className="relative hidden md:block">
             <button
               aria-label="Search"
               onClick={() => setSearchOpen((o) => !o)}
@@ -117,7 +117,7 @@ export default function Navbar() {
           <Link
             to="/saved"
             aria-label={`Saved destinations (${savedCount})`}
-            className="relative hidden h-10 w-10 place-items-center rounded-full border border-(--glass-border) text-(--text-tertiary) transition-colors hover:border-(--border-mid) hover:text-(--text-primary) sm:grid"
+            className="relative hidden h-10 w-10 place-items-center rounded-full border border-(--glass-border) text-(--text-tertiary) transition-colors hover:border-(--border-mid) hover:text-(--text-primary) md:grid"
           >
             <Bookmark size={16} />
             {savedCount > 0 && (
@@ -130,7 +130,7 @@ export default function Navbar() {
           <ThemeToggle />
 
           {user ? (
-            <div className="hidden items-center gap-2 sm:flex">
+            <div className="hidden items-center gap-2 md:flex">
               <span className="rounded-full border border-(--glass-border) px-4 py-2.5 text-sm font-medium text-(--text-primary)">
                 Hi, {user.name.split(' ')[0]}
               </span>
@@ -146,13 +146,13 @@ export default function Navbar() {
             <>
               <Link
                 to="/login"
-                className="hidden rounded-full border border-(--glass-border) px-5 py-2.5 text-sm font-medium text-(--text-primary) transition-colors hover:border-(--border-mid) sm:block"
+                className="hidden rounded-full border border-(--glass-border) px-5 py-2.5 text-sm font-medium text-(--text-primary) transition-colors hover:border-(--border-mid) md:block"
               >
                 Login
               </Link>
               <Link
                 to="/signup"
-                className="btn-gradient hidden items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-semibold text-white shadow-[0_0_20px_rgba(59,130,246,0.35)] transition-transform hover:scale-[1.03] sm:flex"
+                className="btn-gradient hidden items-center gap-1.5 rounded-full px-5 py-2.5 text-sm font-semibold text-white shadow-[0_0_20px_rgba(59,130,246,0.35)] transition-transform hover:scale-[1.03] md:flex"
               >
                 Get Started
                 <span aria-hidden>&rarr;</span>

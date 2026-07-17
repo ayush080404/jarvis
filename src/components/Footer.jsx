@@ -14,7 +14,6 @@ const columns = [
     title: 'Plan',
     links: [
       { label: 'Trip Planner', to: '/trip-planner' },
-      { label: 'Plan My Trip', to: '/plan-my-trip' },
       { label: 'AI Guide', to: '/ai-guide' },
     ],
   },
@@ -50,7 +49,7 @@ export default function Footer() {
               </p>
               <ul className="space-y-2 text-sm">
                 {col.links.map((link) => (
-                  <li key={link.to}>
+                  <li key={link.label}>
                     <Link
                       to={link.to}
                       className="text-(--text-secondary) transition-colors hover:text-(--text-primary)"

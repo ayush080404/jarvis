@@ -46,6 +46,7 @@ const dubai = {
     },
     {
       name: "Dubai Mall",
+      image: "/images/dubaimall.jpg",
       points: [
         "One of the world's largest shopping malls",
         "Features the Dubai Aquarium, an indoor ice rink, and hundreds of restaurants",
@@ -99,6 +100,7 @@ const dubai = {
     },
     {
       name: "Dubai Desert Conservation Reserve",
+      image: "/images/dcr.jpg",
       points: [
         "Experience a desert safari",
         "Dune bashing, camel rides, sandboarding, and BBQ dinner",
@@ -125,6 +127,7 @@ const dubai = {
     },
     {
       name: "Jumeirah Beach",
+      image: "/images/jumehbeach.jpg",
       points: [
         "White-sand beach with views of Burj Al Arab",
         "Perfect for swimming and relaxing",
@@ -142,6 +145,7 @@ const dubai = {
     },
     {
       name: "Global Village",
+      image: "/images/globalvillage.jpg",
       points: [
         "International pavilions, shopping, food, and live performances",
         "Seasonal attraction (typically open in cooler months)",
@@ -149,6 +153,7 @@ const dubai = {
     },
     {
       name: "Dubai Miracle Garden",
+      image: "/images/dubaimiraclegarden.jpg",
       points: [
         "The world's largest natural flower garden",
         "Millions of colorful blooms and creative floral displays",
@@ -157,6 +162,7 @@ const dubai = {
     },
     {
       name: "Aquaventure World",
+      image: "/images/aqua.jpg",
       points: [
         "One of the Middle East's largest water parks",
         "Thrilling slides, lazy rivers, and a private beach",

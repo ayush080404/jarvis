@@ -1,9 +1,10 @@
 import { useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowUp, Globe, Search, Shuffle, X } from 'lucide-react';
+import { ArrowUp, Globe, Search, SearchX, Shuffle, X } from 'lucide-react';
 import { useScrollY } from '../hooks/useScrollY';
 import PageHeader from '../components/PageHeader';
 import DestinationCard from '../components/DestinationCard';
+import EmptyState from '../components/EmptyState';
 import { destinations } from '../data/destinations';
 
 const REGIONS = ['All', ...Array.from(new Set(destinations.map((d) => d.country))).sort()];
@@ -72,12 +73,12 @@ export default function DestinationsPage() {
           so switching region or searching never requires scrolling back up. */}
       <div className="sticky top-20 z-40 w-full border-b border-(--border-soft) bg-(--surface)/85 px-4 py-4 backdrop-blur-md sm:top-24 sm:px-6 lg:px-10">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-wrap gap-2">
+          <div className="flex gap-2 overflow-x-auto whitespace-nowrap pb-1 lg:flex-wrap lg:overflow-visible lg:whitespace-normal lg:pb-0">
             {REGIONS.map((r) => (
               <button
                 key={r}
                 onClick={() => setRegion(r)}
-                className={`rounded-full border px-4 py-1.5 text-xs font-medium uppercase tracking-wide transition-colors ${
+                className={`shrink-0 rounded-full border px-4 py-1.5 text-xs font-medium uppercase tracking-wide transition-colors ${
                   region === r
                     ? 'border-(--border-mid) bg-(--surface-card-hover) text-(--text-primary)'
                     : 'border-(--border-soft) text-(--text-secondary) hover:border-(--border-mid) hover:text-(--text-primary)'
@@ -89,8 +90,8 @@ export default function DestinationsPage() {
             ))}
           </div>
 
-          <div className="flex items-center gap-2 lg:shrink-0">
-            <div className="relative w-full lg:w-64">
+          <div className="flex flex-wrap items-center gap-2 lg:flex-nowrap lg:shrink-0">
+            <div className="relative min-w-[200px] flex-1 lg:w-64 lg:flex-none">
               <Search
                 size={15}
                 className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-(--text-secondary)"
@@ -149,12 +150,11 @@ export default function DestinationsPage() {
             ))}
           </div>
         ) : (
-          <div className="rounded-2xl border border-(--border-soft) bg-(--surface-card) p-10 text-center">
-            <p className="text-(--text-primary)">No destinations match that search.</p>
-            <p className="mt-1 text-sm text-(--text-secondary)">
-              Try a different name, or clear the filter to see everything.
-            </p>
-          </div>
+          <EmptyState
+            icon={SearchX}
+            title="No destinations match that search."
+            description="Try a different name, or clear the filter to see everything."
+          />
         )}
       </section>
 

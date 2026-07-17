@@ -7,7 +7,7 @@ export default function ItineraryResult({ itinerary }) {
 
   return (
     <div className="mt-8 rounded-3xl border border-(--border-soft) bg-(--surface-card) p-6">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-(--text-secondary)">
             Starter itinerary
@@ -17,7 +17,8 @@ export default function ItineraryResult({ itinerary }) {
           </h3>
         </div>
         <span
-          className="rounded-full px-3 py-1 text-xs font-semibold text-white"
+          title={bestTime}
+          className="max-w-[13rem] truncate rounded-full px-3 py-1 text-xs font-semibold text-white"
           style={{ backgroundColor: accentColor }}
         >
           {bestTime}

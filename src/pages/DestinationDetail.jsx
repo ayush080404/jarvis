@@ -522,7 +522,7 @@ export default function DestinationDetail() {
         )}
 
         <Link
-          to="/plan-my-trip"
+          to={`/trip-planner?destination=${slug}`}
           className="btn-gradient mt-10 inline-flex items-center gap-2 rounded-xl px-6 py-3.5 text-sm font-semibold text-white shadow-[0_0_25px_rgba(59,130,246,0.35)] transition-transform hover:scale-[1.02]"
         >
           Plan a trip to {name}

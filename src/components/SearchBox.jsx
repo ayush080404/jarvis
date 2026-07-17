@@ -1,24 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Search as SearchIcon, X } from 'lucide-react';
-import { destinations } from '../data/destinations';
+import { MapPin, Newspaper, Compass, Search as SearchIcon, X } from 'lucide-react';
+import { searchSite } from '../utils/search';
 
-function getMatches(query) {
-  const q = query.trim().toLowerCase();
-  if (!q) return [];
-  return destinations
-    .filter(
-      (d) =>
-        d.name.toLowerCase().includes(q) ||
-        d.country.toLowerCase().includes(q) ||
-        d.tag.toLowerCase().includes(q)
-    )
-    .slice(0, 6);
-}
+const TYPE_ICON = { destination: MapPin, blog: Newspaper, theme: Compass };
+const TYPE_LABEL = { destination: 'Destinations', blog: 'From the blog', theme: 'Browse by theme' };
 
 export default function SearchBox({
   variant = 'hero',
-  placeholder = 'Search any country, city or destination...',
+  placeholder = 'Search destinations, guides, themes...',
   autoFocus = false,
   onNavigate,
 }) {
@@ -28,7 +18,7 @@ export default function SearchBox({
   const containerRef = useRef(null);
   const navigate = useNavigate();
 
-  const matches = useMemo(() => getMatches(query), [query]);
+  const matches = useMemo(() => searchSite(query), [query]);
 
   useEffect(() => {
     function onClickOutside(e) {
@@ -44,17 +34,17 @@ export default function SearchBox({
     setActiveIndex(-1);
   }, [query]);
 
-  function goTo(slug) {
+  function goTo(to) {
     setOpen(false);
     setQuery('');
-    navigate(`/destinations/${slug}`);
+    navigate(to);
     onNavigate?.();
   }
 
   function handleSubmit(e) {
     e.preventDefault();
     if (matches.length > 0) {
-      goTo(matches[activeIndex >= 0 ? activeIndex : 0].slug);
+      goTo(matches[activeIndex >= 0 ? activeIndex : 0].to);
     } else if (query.trim()) {
       navigate('/destinations');
       setOpen(false);
@@ -81,10 +71,11 @@ export default function SearchBox({
     <div ref={containerRef} className="relative w-full">
       <form
         onSubmit={handleSubmit}
+        role="search"
         className={
           isHero
-            ? 'flex items-center gap-2 rounded-2xl border border-(--border-soft) bg-(--input-bg) p-2 pl-4 backdrop-blur-sm'
-            : 'flex items-center gap-2 rounded-full border border-(--glass-border) bg-(--glass-b) p-1.5 pl-3.5 backdrop-blur-sm'
+            ? 'flex items-center gap-2 rounded-2xl border border-(--border-soft) bg-(--input-bg) p-2 pl-4 backdrop-blur-sm transition-colors focus-within:border-(--border-mid)'
+            : 'flex items-center gap-2 rounded-full border border-(--glass-border) bg-(--glass-b) p-1.5 pl-3.5 backdrop-blur-sm transition-colors focus-within:border-(--border-mid)'
         }
       >
         <SearchIcon size={isHero ? 18 : 15} className="shrink-0 text-(--text-secondary)" />
@@ -99,6 +90,11 @@ export default function SearchBox({
           onFocus={() => setOpen(true)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
+          aria-label="Search Voyora"
+          aria-expanded={open && query.trim().length > 0}
+          aria-controls="site-search-results"
+          role="combobox"
+          aria-autocomplete="list"
           className="w-full bg-transparent text-sm text-(--text-primary) placeholder:text-(--text-secondary) focus:outline-none"
         />
         {query && (
@@ -126,38 +122,56 @@ export default function SearchBox({
       </form>
 
       {open && query.trim() && (
-        <div className="liquid-glass absolute left-0 right-0 top-full z-30 mt-2 max-h-80 overflow-y-auto rounded-2xl p-2">
+        <div
+          id="site-search-results"
+          role="listbox"
+          className="liquid-glass absolute left-0 right-0 top-full z-30 mt-2 max-h-96 overflow-y-auto rounded-2xl p-2"
+        >
           {matches.length > 0 ? (
             <ul>
-              {matches.map((d, i) => (
-                <li key={d.slug}>
-                  <button
-                    type="button"
-                    onClick={() => goTo(d.slug)}
-                    onMouseEnter={() => setActiveIndex(i)}
-                    className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors ${
-                      activeIndex === i ? 'bg-(--surface-card-hover)' : ''
-                    }`}
-                  >
-                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-blue-500/25 to-violet-500/25 text-sky-400">
-                      <MapPin size={14} />
-                    </span>
-                    <span>
-                      <span className="block text-sm font-medium text-(--text-primary)">
-                        {d.name}
+              {matches.map((item, i) => {
+                const Icon = TYPE_ICON[item.type];
+                const showHeading = i === 0 || matches[i - 1].type !== item.type;
+                return (
+                  <li key={item.key}>
+                    {showHeading && (
+                      <p className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-(--text-secondary)">
+                        {TYPE_LABEL[item.type]}
+                      </p>
+                    )}
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={activeIndex === i}
+                      onClick={() => goTo(item.to)}
+                      onMouseEnter={() => setActiveIndex(i)}
+                      className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors ${
+                        activeIndex === i ? 'bg-(--surface-card-hover)' : ''
+                      }`}
+                    >
+                      <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-blue-500/25 to-violet-500/25 text-sky-400">
+                        <Icon size={14} />
                       </span>
-                      <span className="block text-xs text-(--text-secondary)">
-                        {d.country} &middot; {d.tag}
+                      <span className="min-w-0">
+                        <span className="block truncate text-sm font-medium text-(--text-primary)">
+                          {item.title}
+                        </span>
+                        <span className="block truncate text-xs text-(--text-secondary)">
+                          {item.subtitle}
+                        </span>
                       </span>
-                    </span>
-                  </button>
-                </li>
-              ))}
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           ) : (
-            <p className="px-3 py-4 text-center text-sm text-(--text-secondary)">
-              No matches yet — try a city or country name.
-            </p>
+            <div className="px-3 py-6 text-center">
+              <p className="text-sm text-(--text-primary)">No results for "{query.trim()}"</p>
+              <p className="mt-1 text-xs text-(--text-secondary)">
+                Try a destination, country, or blog topic.
+              </p>
+            </div>
           )}
         </div>
       )}

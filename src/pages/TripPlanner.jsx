@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { CalendarRange, MapPin, Wallet, Check, Search } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import ItineraryResult from '../components/ItineraryResult';
@@ -6,13 +7,26 @@ import { destinations } from '../data/destinations';
 import { buildItinerary, TRIP_STYLES } from '../utils/itinerary';
 
 export default function TripPlanner() {
-  const [step, setStep] = useState(1);
-  const [query, setQuery] = useState('');
-  const [destSlug, setDestSlug] = useState(null);
+  const [searchParams] = useSearchParams();
+  const preselectSlug = searchParams.get('destination');
+  const preselected = destinations.find((d) => d.slug === preselectSlug) || null;
+
+  const [query, setQuery] = useState(preselected?.name || '');
+  const [destSlug, setDestSlug] = useState(preselected?.slug || null);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [style, setStyle] = useState('balanced');
   const [itinerary, setItinerary] = useState(null);
+
+  // Coming from a destination page's "Plan a trip to X" button — arrives as
+  // /trip-planner?destination=slug, so step 1 is already filled in.
+  useEffect(() => {
+    if (preselected) {
+      setQuery(preselected.name);
+      setDestSlug(preselected.slug);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preselectSlug]);
 
   const matches = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -25,7 +39,6 @@ export default function TripPlanner() {
   function pickDestination(d) {
     setDestSlug(d.slug);
     setQuery(d.name);
-    setStep(2);
   }
 
   function generate() {

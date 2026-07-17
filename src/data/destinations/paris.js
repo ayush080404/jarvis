@@ -62,6 +62,7 @@ const paris = {
     },
     {
       name: "Louvre Museum",
+      image: "/images/louvere.jpg",
       points: [
         "Home to the Mona Lisa and thousands of masterpieces",
         "Perfect for art and history lovers",
@@ -88,6 +89,7 @@ const paris = {
     },
     {
       name: "French Riviera",
+      image: "/images/frenchrivera.jpg",
       points: [
         "Famous for luxury beaches and Mediterranean views",
         "Visit Nice, Cannes, Antibes, and Saint-Tropez",
@@ -101,6 +103,7 @@ const paris = {
     },
     {
       name: "Provence",
+      image: "/images/provence.jpg",
       points: [
         "Endless lavender fields (best in June–July)",
         "Charming villages",
@@ -109,6 +112,7 @@ const paris = {
     },
     {
       name: "Loire Valley",
+      image: "/images/loirevalley.jpg",
       points: [
         "Known as the \"Valley of Castles\"",
         "Visit Château de Chambord and Château de Chenonceau",
@@ -153,10 +157,12 @@ const paris = {
     },
     {
       name: "Lyon",
+      image: "/images/lyon.jpg",
       points: ["France's culinary capital", "Historic Old Town", "Famous bouchon restaurants"],
     },
     {
       name: "Strasbourg",
+      image: "/images/starsbourg.jpg",
       points: [
         "Blend of French and German culture",
         "Stunning cathedral",
@@ -165,6 +171,7 @@ const paris = {
     },
     {
       name: "Étretat Cliffs",
+      image: "/images/cliff.jpg",
       points: [
         "Dramatic white chalk cliffs",
         "Excellent hiking trails",

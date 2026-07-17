@@ -68,7 +68,7 @@ export default function Signup() {
           <label className="mb-1.5 block text-sm font-medium text-(--text-secondary)">
             Full name
           </label>
-          <div className="flex items-center gap-2.5 rounded-xl border border-(--border-soft) bg-(--input-bg) px-4 py-2.5">
+          <div className="flex items-center gap-2.5 rounded-xl border border-(--border-soft) bg-(--input-bg) px-4 py-2.5 transition-colors focus-within:border-(--border-mid)">
             <User size={16} className="shrink-0 text-(--text-secondary)" />
             <input
               type="text"
@@ -84,7 +84,7 @@ export default function Signup() {
           <label className="mb-1.5 block text-sm font-medium text-(--text-secondary)">
             Email
           </label>
-          <div className="flex items-center gap-2.5 rounded-xl border border-(--border-soft) bg-(--input-bg) px-4 py-2.5">
+          <div className="flex items-center gap-2.5 rounded-xl border border-(--border-soft) bg-(--input-bg) px-4 py-2.5 transition-colors focus-within:border-(--border-mid)">
             <Mail size={16} className="shrink-0 text-(--text-secondary)" />
             <input
               type="email"
@@ -100,7 +100,7 @@ export default function Signup() {
           <label className="mb-1.5 block text-sm font-medium text-(--text-secondary)">
             Password
           </label>
-          <div className="flex items-center gap-2.5 rounded-xl border border-(--border-soft) bg-(--input-bg) px-4 py-2.5">
+          <div className="flex items-center gap-2.5 rounded-xl border border-(--border-soft) bg-(--input-bg) px-4 py-2.5 transition-colors focus-within:border-(--border-mid)">
             <Lock size={16} className="shrink-0 text-(--text-secondary)" />
             <input
               type="password"

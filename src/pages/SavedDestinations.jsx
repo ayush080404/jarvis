@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Bookmark, X, Compass } from 'lucide-react';
+import { Bookmark, Compass, X } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import DestinationCard from '../components/DestinationCard';
+import EmptyState from '../components/EmptyState';
 import { destinations } from '../data/destinations';
 import { getSavedSlugs, removeSaved, onSavedChange } from '../utils/saved';
 
@@ -43,19 +43,13 @@ export default function SavedDestinations() {
             ))}
           </div>
         ) : (
-          <div className="rounded-2xl border border-(--border-soft) bg-(--surface-card) p-10 text-center">
-            <p className="text-(--text-primary)">Nothing saved yet.</p>
-            <p className="mt-1.5 text-sm text-(--text-secondary)">
-              Tap the bookmark icon on any destination page to keep it here.
-            </p>
-            <Link
-              to="/destinations"
-              className="btn-gradient mt-5 inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white"
-            >
-              <Compass size={15} />
-              Browse destinations
-            </Link>
-          </div>
+          <EmptyState
+            icon={Compass}
+            title="Nothing saved yet."
+            description="Tap the bookmark icon on any destination page to keep it here."
+            actionLabel="Browse destinations"
+            actionTo="/destinations"
+          />
         )}
       </section>
     </>

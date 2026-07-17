@@ -52,6 +52,7 @@ const austria = {
     },
     {
       name: "Vienna",
+      image: "/images/vienna.jpg",
       points: [
         "Austria's elegant capital city",
         "Visit Schönbrunn Palace, St. Stephen's Cathedral, and the Vienna State Opera",
@@ -87,6 +88,7 @@ const austria = {
     },
     {
       name: "Grossglockner High Alpine Road",
+      image: "/images/gloss.jpg",
       points: [
         "One of Europe's most scenic drives",
         "Stunning mountain panoramas",

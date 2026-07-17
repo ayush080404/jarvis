@@ -67,7 +67,7 @@ export default function Hero() {
               Explore Countries
             </Link>
             <Link
-              to="/plan-my-trip"
+              to="/trip-planner"
               className="flex items-center gap-2 rounded-xl border border-(--glass-border) px-6 py-3.5 text-sm font-semibold text-(--text-primary) transition-colors hover:border-(--border-mid)"
             >
               <BookMarked size={16} />
