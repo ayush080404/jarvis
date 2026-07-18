@@ -148,8 +148,8 @@ export default function DestinationsPage() {
 
         {filtered.length > 0 ? (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((d) => (
-              <DestinationCard key={d.slug} destination={d} />
+            {filtered.map((d, i) => (
+              <DestinationCard key={d.slug} destination={d} priority={i < 6} />
             ))}
           </div>
         ) : (

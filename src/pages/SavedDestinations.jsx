@@ -31,7 +31,7 @@ export default function SavedDestinations() {
       <section className="mx-auto max-w-6xl px-6 pb-24 lg:px-10">
         {saved.length > 0 ? (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {saved.map((d) => (
+            {saved.map((d, i) => (
               <div key={d.slug} className="relative">
                 <button
                   onClick={() => removeSaved(d.slug)}
@@ -40,7 +40,7 @@ export default function SavedDestinations() {
                 >
                   <X size={14} />
                 </button>
-                <DestinationCard destination={d} />
+                <DestinationCard destination={d} priority={i < 6} />
               </div>
             ))}
           </div>
