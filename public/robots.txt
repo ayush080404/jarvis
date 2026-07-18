@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /login
+Disallow: /signup
+Disallow: /saved
+
+Sitemap: https://jarvis-ashy-nu.vercel.app/sitemap.xml
