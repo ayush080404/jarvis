@@ -45,6 +45,12 @@ export default function Explore() {
         eyebrow="Discover"
         title="Explore the world, by theme"
         subtitle="Browse destinations by what you're actually in the mood for — not just a map pin."
+        images={[
+          '/images/santorini_blue_domes.jpg',
+          '/images/zermatt_matterhorn.jpg',
+          '/images/taj_mahal_sunrise.jpg',
+          '/images/marina_bay_sands_night.jpg',
+        ]}
       />
       <section className="mx-auto max-w-6xl px-6 pb-24 lg:px-10">
         <DestinationQuiz />

@@ -59,6 +59,12 @@ export default function AIGuide() {
         eyebrow="AI Guide"
         title="Your personal travel assistant"
         subtitle="Ask about visas, packing, itineraries, or where to eat — get answers built from real traveler guides."
+        images={[
+          '/images/paris.jpg',
+          '/images/fuji_cherry_blossoms.jpg',
+          '/images/marrakech_jemaa_el_fnaa_dusk.jpg',
+          '/images/marina_bay_sands_night.jpg',
+        ]}
       />
 
       <section className="mx-auto max-w-2xl px-6 pb-24 lg:px-10">

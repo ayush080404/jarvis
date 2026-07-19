@@ -14,11 +14,12 @@ import {
   CalendarRange,
   Bookmark,
   BookmarkCheck,
-  Share2,
   Map as MapIcon,
 } from 'lucide-react';
 import { destinations, getDestinationBySlug } from '../data/destinations';
 import DestinationCard from '../components/DestinationCard';
+import ShareButton from '../components/ShareButton';
+import PackingChecklist from '../components/PackingChecklist';
 import { isSaved, toggleSaved } from '../utils/saved';
 import { usePageTitle } from '../hooks/usePageTitle';
 
@@ -28,7 +29,6 @@ export default function DestinationDetail() {
   usePageTitle(destination?.name);
 
   const [saved, setSaved] = useState(false);
-  const [shareCopied, setShareCopied] = useState(false);
   const [activeSection, setActiveSection] = useState('overview');
   const sectionRefs = useRef({});
 
@@ -52,6 +52,7 @@ export default function DestinationDetail() {
     if (destination.mustTryFood?.length > 0) {
       items.push({ id: 'food', label: 'Food' });
     }
+    items.push({ id: 'packing', label: 'Packing' });
     if (destination.gallery?.length > 0) {
       items.push({ id: 'gallery', label: 'Gallery' });
     }
@@ -114,24 +115,7 @@ export default function DestinationDetail() {
     setSaved(toggleSaved(slug));
   }
 
-  async function handleShare() {
-    const url = window.location.href;
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: `${name} — Voyora`, url });
-      } catch {
-        /* user cancelled — no-op */
-      }
-      return;
-    }
-    try {
-      await navigator.clipboard.writeText(url);
-      setShareCopied(true);
-      setTimeout(() => setShareCopied(false), 2000);
-    } catch {
-      /* clipboard unavailable — no-op */
-    }
-  }
+
 
   const related = destinations
     .filter((d) => d.slug !== slug && d.country === country)
@@ -206,18 +190,10 @@ export default function DestinationDetail() {
               >
                 {saved ? <BookmarkCheck size={15} /> : <Bookmark size={15} />}
               </button>
-              <button
-                onClick={handleShare}
-                aria-label="Share destination"
+              <ShareButton
+                title={name}
                 className="grid h-9 w-9 place-items-center rounded-full border border-white/25 bg-black/20 text-white backdrop-blur transition-colors hover:bg-black/35"
-              >
-                <Share2 size={15} />
-              </button>
-              {shareCopied && (
-                <span className="rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-white backdrop-blur">
-                  Link copied
-                </span>
-              )}
+              />
             </div>
           </div>
         </div>
@@ -494,6 +470,10 @@ export default function DestinationDetail() {
             </div>
           </div>
         )}
+
+        <div ref={registerSection('packing')} className="mt-10 scroll-mt-32">
+          <PackingChecklist destination={destination} />
+        </div>
 
         {gallery && gallery.length > 0 && (
           <div ref={registerSection('gallery')} className="mt-10 scroll-mt-32">

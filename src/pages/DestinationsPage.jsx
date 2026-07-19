@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowUp, Globe, Search, SearchX, Shuffle, X } from 'lucide-react';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { ArrowUp, Globe, Search, SearchX, Shuffle, X, GitCompare } from 'lucide-react';
 import { useScrollY } from '../hooks/useScrollY';
 import { usePageTitle } from '../hooks/usePageTitle';
 import PageHeader from '../components/PageHeader';
@@ -70,6 +70,12 @@ export default function DestinationsPage() {
         eyebrow={`${destinations.length} destinations`}
         title="Where would you like to go?"
         subtitle="Every destination guide currently live on Voyora"
+        images={[
+          '/images/paris.jpg',
+          '/images/fuji_cherry_blossoms.jpg',
+          '/images/pyramids_of_giza.jpg',
+          '/images/santorini_blue_domes.jpg',
+        ]}
       />
 
       {/* Sticky filter bar: stays reachable while scrolling through many cards,
@@ -125,6 +131,13 @@ export default function DestinationsPage() {
               <Shuffle size={14} />
               Surprise me
             </button>
+            <Link
+              to="/compare"
+              className="flex shrink-0 items-center gap-1.5 rounded-full border border-(--border-soft) px-4 py-2 text-xs font-semibold uppercase tracking-wide text-(--text-primary) transition-colors hover:border-(--border-mid) hover:bg-(--surface-card-hover)"
+            >
+              <GitCompare size={14} />
+              Compare
+            </Link>
           </div>
         </div>
       </div>
@@ -149,7 +162,7 @@ export default function DestinationsPage() {
         {filtered.length > 0 ? (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((d, i) => (
-              <DestinationCard key={d.slug} destination={d} priority={i < 6} />
+              <DestinationCard key={d.slug} destination={d} priority={i < 6} isLCP={i === 0} />
             ))}
           </div>
         ) : (

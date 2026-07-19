@@ -15,6 +15,8 @@ const columns = [
     links: [
       { label: 'Trip Planner', to: '/trip-planner' },
       { label: 'AI Guide', to: '/ai-guide' },
+      { label: 'Compare', to: '/compare' },
+      { label: 'My Voyora', to: '/my-voyora' },
     ],
   },
   {

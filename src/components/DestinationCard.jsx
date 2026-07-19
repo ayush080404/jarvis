@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, MapPin, Layers } from 'lucide-react';
 
-export default function DestinationCard({ destination, priority = false }) {
+export default function DestinationCard({ destination, priority = false, isLCP = false }) {
   const { slug, name, country, tag, heroImage, accentColor, placesToVisit, bestTime } = destination;
   const [loaded, setLoaded] = useState(false);
 
@@ -40,7 +40,7 @@ export default function DestinationCard({ destination, priority = false }) {
               src={heroImage}
               alt={name}
               loading={priority ? 'eager' : 'lazy'}
-              fetchPriority={priority ? 'high' : 'auto'}
+              fetchPriority={isLCP ? 'high' : 'auto'}
               onLoad={() => setLoaded(true)}
               className={`relative h-full w-full object-cover transition-all duration-500 group-hover:scale-105 ${
                 loaded ? 'opacity-100' : 'opacity-0'

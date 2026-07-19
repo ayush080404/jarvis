@@ -131,9 +131,12 @@ export default function Navbar() {
 
           {user ? (
             <div className="hidden items-center gap-2 md:flex">
-              <span className="rounded-full border border-(--glass-border) px-4 py-2.5 text-sm font-medium text-(--text-primary)">
+              <Link
+                to="/my-voyora"
+                className="rounded-full border border-(--glass-border) px-4 py-2.5 text-sm font-medium text-(--text-primary) transition-colors hover:border-(--border-mid)"
+              >
                 Hi, {user.name.split(' ')[0]}
-              </span>
+              </Link>
               <button
                 onClick={handleLogout}
                 aria-label="Log out"
@@ -211,6 +214,19 @@ export default function Navbar() {
                     {savedCount}
                   </span>
                 )}
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/my-voyora"
+                onClick={() => setMobileOpen(false)}
+                className={({ isActive }) =>
+                  `block rounded-xl px-3 py-2.5 transition-colors hover:bg-(--surface-card) hover:text-(--text-primary) ${
+                    isActive ? 'text-(--text-primary)' : ''
+                  }`
+                }
+              >
+                My Voyora
               </NavLink>
             </li>
           </ul>

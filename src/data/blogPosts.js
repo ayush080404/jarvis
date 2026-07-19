@@ -3,6 +3,8 @@ const blogPosts = [
     slug: '48-hours-in-lisbon',
     title: '48 hours in Lisbon, done right',
     tag: 'City guide',
+    author: 'Voyora Editorial',
+    coverImage: '/images/lisbon_tram_28.jpg',
     readTime: '6 min read',
     excerpt:
       'A tight two-day route through Lisbon\u2019s hills, trams, and miradouros for a first visit that doesn\u2019t feel rushed.',
@@ -29,6 +31,8 @@ const blogPosts = [
     slug: 'packing-light-for-asia',
     title: 'Packing light for a 3-week Asia trip',
     tag: 'Tips',
+    author: 'Voyora Editorial',
+    coverImage: '/images/ha_long_bay_aerial.jpg',
     readTime: '8 min read',
     excerpt:
       'How to fit three weeks across multiple climates and countries into one carry-on, without leaving the essentials behind.',
@@ -55,6 +59,8 @@ const blogPosts = [
     slug: 'best-shoulder-season-destinations-2026',
     title: 'The best shoulder-season destinations for 2026',
     tag: 'Trends',
+    author: 'Voyora Editorial',
+    coverImage: '/images/santorini_blue_domes.jpg',
     readTime: '5 min read',
     excerpt:
       'Fewer crowds, better prices, and weather that\u2019s often more comfortable than peak season \u2014 here\u2019s where shoulder season pays off most.',

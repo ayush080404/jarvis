@@ -22,6 +22,12 @@ export default function ExploreCountries() {
         eyebrow={`${destinations.length} destinations`}
         title="Browse by region"
         subtitle="Every region we currently cover on Voyora, and how many guides live there."
+        images={[
+          '/images/marrakech_jemaa_el_fnaa_dusk.jpg',
+          '/images/victoria_peak_skyline.jpg',
+          '/images/taj_mahal_sunrise.jpg',
+          '/images/tegallalang_rice_terrace.jpg',
+        ]}
       />
       <section className="mx-auto max-w-5xl px-6 pb-24 lg:px-10">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">

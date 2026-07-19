@@ -1,4 +1,36 @@
-export default function PageHeader({ icon: Icon, eyebrow, title, subtitle }) {
+export default function PageHeader({ icon: Icon, eyebrow, title, subtitle, images }) {
+  if (images && images.length > 0) {
+    return (
+      <div className="relative h-[42vh] min-h-[280px] w-full overflow-hidden bg-(--surface)">
+        <div className="grid h-full grid-cols-4">
+          {images.slice(0, 4).map((src) => (
+            <img key={src} src={src} alt="" className="h-full w-full object-cover opacity-70" />
+          ))}
+        </div>
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              'linear-gradient(to top, var(--surface) 5%, rgba(0,0,0,0.45) 45%, rgba(0,0,0,0.25) 100%)',
+          }}
+        />
+        <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
+          {eyebrow && (
+            <p className="text-xs font-semibold uppercase tracking-widest text-sky-300">
+              {eyebrow}
+            </p>
+          )}
+          <h1 className="mt-2 font-display text-4xl font-extrabold text-white sm:text-5xl">
+            {title}
+          </h1>
+          {subtitle && (
+            <p className="mt-3 max-w-md text-sm text-white/80 sm:text-base">{subtitle}</p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative overflow-hidden">
       <div className="starfield" />

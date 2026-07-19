@@ -20,6 +20,18 @@ export default function SavedDestinations() {
     .map((slug) => destinations.find((d) => d.slug === slug))
     .filter(Boolean);
 
+  // Personal touch: once someone has saved destinations, show their actual
+  // photos in the header instead of a generic set — falls back to a
+  // curated default while the list is still empty.
+  const fallbackImages = [
+    '/images/paris.jpg',
+    '/images/fuji_cherry_blossoms.jpg',
+    '/images/pyramids_of_giza.jpg',
+    '/images/santorini_blue_domes.jpg',
+  ];
+  const headerImages =
+    saved.length > 0 ? saved.slice(0, 4).map((d) => d.heroImage) : fallbackImages;
+
   return (
     <>
       <PageHeader
@@ -27,6 +39,7 @@ export default function SavedDestinations() {
         eyebrow={`${saved.length} saved`}
         title="Your saved destinations"
         subtitle="Everything you've bookmarked, kept in this browser so you can pick up planning anytime."
+        images={headerImages}
       />
       <section className="mx-auto max-w-6xl px-6 pb-24 lg:px-10">
         {saved.length > 0 ? (
@@ -40,7 +53,7 @@ export default function SavedDestinations() {
                 >
                   <X size={14} />
                 </button>
-                <DestinationCard destination={d} priority={i < 6} />
+                <DestinationCard destination={d} priority={i < 6} isLCP={i === 0} />
               </div>
             ))}
           </div>
