@@ -120,8 +120,15 @@ export default function DestinationDetail() {
 
   async function handleToggleSaved() {
     const result = await toggleSaved(slug);
-    if (result.error) {
+    if (result.error === 'Log in to save destinations.') {
       navigate('/login');
+      return;
+    }
+    if (result.error) {
+      // Logged in, but the database write itself failed — don't silently
+      // show "saved" for something that didn't actually persist.
+      console.error('Save failed:', result.error);
+      alert(`Couldn't save this destination: ${result.error}`);
       return;
     }
     setSaved(result.saved);

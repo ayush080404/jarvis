@@ -17,7 +17,10 @@ export async function getSavedSlugs() {
     .select('destination_slug')
     .order('created_at', { ascending: false });
 
-  if (error) return [];
+  if (error) {
+    console.error('getSavedSlugs failed:', error.message, error);
+    return [];
+  }
   return data.map((row) => row.destination_slug);
 }
 
@@ -38,8 +41,9 @@ export async function isSaved(slug) {
 }
 
 // Toggles saved state for the current user. Returns { saved, error } —
-// error is set (and saved stays false) if nobody's logged in, so the UI can
-// prompt someone to log in instead of silently failing.
+// error is set if nobody's logged in, or if the database write itself
+// failed (this used to be assumed successful without checking, which
+// could report "saved" in the UI even when nothing was actually written).
 export async function toggleSaved(slug) {
   const {
     data: { user },
@@ -56,14 +60,26 @@ export async function toggleSaved(slug) {
     .maybeSingle();
 
   if (existing) {
-    await supabase.from('saved_destinations').delete().eq('id', existing.id);
+    const { error } = await supabase
+      .from('saved_destinations')
+      .delete()
+      .eq('id', existing.id);
+    if (error) {
+      console.error('toggleSaved (remove) failed:', error.message, error);
+      return { saved: true, error: error.message };
+    }
     notifyChange();
     return { saved: false };
   }
 
-  await supabase
+  const { error } = await supabase
     .from('saved_destinations')
     .insert({ user_id: user.id, destination_slug: slug });
+
+  if (error) {
+    console.error('toggleSaved (insert) failed:', error.message, error);
+    return { saved: false, error: error.message };
+  }
   notifyChange();
   return { saved: true };
 }
@@ -74,11 +90,16 @@ export async function removeSaved(slug) {
   } = await supabase.auth.getUser();
   if (!user) return;
 
-  await supabase
+  const { error } = await supabase
     .from('saved_destinations')
     .delete()
     .eq('user_id', user.id)
     .eq('destination_slug', slug);
+
+  if (error) {
+    console.error('removeSaved failed:', error.message, error);
+    return;
+  }
   notifyChange();
 }
 
