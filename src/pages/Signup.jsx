@@ -39,12 +39,21 @@ export default function Signup() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [needsConfirmation, setNeedsConfirmation] = useState(false);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    const result = signup({ name, email, password });
+    setError('');
+    setIsSubmitting(true);
+    const result = await signup({ name, email, password });
+    setIsSubmitting(false);
     if (result.error) {
       setError(result.error);
+      return;
+    }
+    if (result.needsEmailConfirmation) {
+      setNeedsConfirmation(true);
       return;
     }
     navigate('/');
@@ -65,6 +74,21 @@ export default function Signup() {
         </Link>
       </p>
 
+      {needsConfirmation ? (
+        <div className="mt-8 rounded-xl border border-(--border-soft) bg-(--surface-card) p-5">
+          <p className="text-sm font-medium text-(--text-primary)">Check your email</p>
+          <p className="mt-1.5 text-sm text-(--text-secondary)">
+            We sent a confirmation link to <span className="text-(--text-primary)">{email}</span>.
+            Click it, then come back and log in.
+          </p>
+          <Link
+            to="/login"
+            className="btn-gradient mt-4 inline-flex items-center rounded-xl px-5 py-2.5 text-sm font-semibold text-white"
+          >
+            Go to login
+          </Link>
+        </div>
+      ) : (
       <form onSubmit={handleSubmit} className="mt-8 space-y-4">
         <div>
           <label className="mb-1.5 block text-sm font-medium text-(--text-secondary)">
@@ -118,15 +142,13 @@ export default function Signup() {
 
         <button
           type="submit"
-          className="btn-gradient w-full rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-[0_0_25px_rgba(59,130,246,0.35)] transition-transform hover:scale-[1.01]"
+          disabled={isSubmitting}
+          className="btn-gradient w-full rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-[0_0_25px_rgba(59,130,246,0.35)] transition-transform hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60"
         >
-          Create account
+          {isSubmitting ? 'Creating account...' : 'Create account'}
         </button>
-
-        <p className="text-center text-xs text-(--text-secondary)">
-          Accounts are stored only in this browser for now — there&apos;s no real backend yet.
-        </p>
       </form>
+      )}
 
       <p className="mt-6 text-center text-xs text-(--text-secondary)">
         By signing up, you agree to Voyora&apos;s Terms of Service and Privacy Policy.

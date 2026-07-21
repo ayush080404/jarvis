@@ -1,61 +1,67 @@
-// Demo-only auth: stores a user record in this browser's localStorage.
-// There is no backend, no password hashing, and no real security here —
-// it exists so Login/Signup have real, working state to react to instead
-// of dead buttons, until a real auth backend is wired up.
+import { supabase } from '../lib/supabase';
 
-const USER_KEY = 'voyora:user';
-const AUTH_EVENT = 'voyora:auth-change';
+// Real authentication now — accounts are created and verified by Supabase,
+// not just remembered in this browser. Sessions persist across devices as
+// long as you log in with the same email.
 
-export function getCurrentUser() {
-  try {
-    return JSON.parse(localStorage.getItem(USER_KEY) || 'null');
-  } catch {
-    return null;
-  }
+function mapUser(supabaseUser) {
+  if (!supabaseUser) return null;
+  return {
+    id: supabaseUser.id,
+    email: supabaseUser.email,
+    name: supabaseUser.user_metadata?.name || supabaseUser.email?.split('@')[0] || 'Traveler',
+  };
 }
 
-function setCurrentUser(user) {
-  if (user) {
-    localStorage.setItem(USER_KEY, JSON.stringify(user));
-  } else {
-    localStorage.removeItem(USER_KEY);
-  }
-  window.dispatchEvent(new Event(AUTH_EVENT));
-}
-
-export function signup({ name, email, password }) {
+export async function signup({ name, email, password }) {
   if (!name?.trim()) return { error: 'Enter your name.' };
   if (!/^\S+@\S+\.\S+$/.test(email || '')) return { error: 'Enter a valid email address.' };
   if (!password || password.length < 6) return { error: 'Password must be at least 6 characters.' };
 
-  const user = { name: name.trim(), email: email.trim().toLowerCase() };
-  setCurrentUser(user);
-  return { user };
+  const { data, error } = await supabase.auth.signUp({
+    email: email.trim().toLowerCase(),
+    password,
+    options: { data: { name: name.trim() } },
+  });
+
+  if (error) return { error: error.message };
+
+  // Supabase's default project settings require confirming your email
+  // before a session exists — data.session is null in that case even
+  // though the account was created successfully.
+  const needsEmailConfirmation = !data.session;
+  return { user: mapUser(data.user), needsEmailConfirmation };
 }
 
-export function login({ email, password }) {
+export async function login({ email, password }) {
   if (!/^\S+@\S+\.\S+$/.test(email || '')) return { error: 'Enter a valid email address.' };
   if (!password) return { error: 'Enter your password.' };
 
-  // No real credential check exists yet — any password "works" against a
-  // locally-remembered email, which is fine for a demo but must not be
-  // treated as real authentication.
-  const existing = getCurrentUser();
-  const name = existing?.email === email.trim().toLowerCase() ? existing.name : email.split('@')[0];
-  const user = { name, email: email.trim().toLowerCase() };
-  setCurrentUser(user);
-  return { user };
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: email.trim().toLowerCase(),
+    password,
+  });
+
+  if (error) return { error: error.message };
+  return { user: mapUser(data.user) };
 }
 
-export function logout() {
-  setCurrentUser(null);
+export async function logout() {
+  await supabase.auth.signOut();
 }
 
+export async function getCurrentUser() {
+  const { data } = await supabase.auth.getUser();
+  return mapUser(data.user);
+}
+
+// Fires immediately with the current auth state, then again on every future
+// login/logout/token refresh — so a component can just do:
+//   useEffect(() => onAuthChange(setUser), [])
+// and always stay in sync without a separate initial fetch.
 export function onAuthChange(callback) {
-  window.addEventListener(AUTH_EVENT, callback);
-  window.addEventListener('storage', callback);
-  return () => {
-    window.removeEventListener(AUTH_EVENT, callback);
-    window.removeEventListener('storage', callback);
-  };
+  const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+    callback(mapUser(session?.user));
+  });
+  return () => data.subscription.unsubscribe();
 }

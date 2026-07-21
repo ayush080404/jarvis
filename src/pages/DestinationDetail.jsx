@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useParams, Navigate } from 'react-router-dom';
+import { Link, useParams, Navigate, useNavigate } from 'react-router-dom';
 import {
   MapPin,
   Calendar,
@@ -25,6 +25,7 @@ import { usePageTitle } from '../hooks/usePageTitle';
 
 export default function DestinationDetail() {
   const { slug } = useParams();
+  const navigate = useNavigate();
   const destination = getDestinationBySlug(slug);
   usePageTitle(destination?.name);
 
@@ -34,7 +35,13 @@ export default function DestinationDetail() {
 
   useEffect(() => {
     if (!slug) return;
-    setSaved(isSaved(slug));
+    let cancelled = false;
+    isSaved(slug).then((result) => {
+      if (!cancelled) setSaved(result);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [slug]);
 
   const navItems = useMemo(() => {
@@ -111,8 +118,13 @@ export default function DestinationDetail() {
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  function handleToggleSaved() {
-    setSaved(toggleSaved(slug));
+  async function handleToggleSaved() {
+    const result = await toggleSaved(slug);
+    if (result.error) {
+      navigate('/login');
+      return;
+    }
+    setSaved(result.saved);
   }
 
 

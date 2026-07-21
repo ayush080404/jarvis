@@ -1,20 +1,41 @@
 import { useEffect, useState } from 'react';
-import { Bookmark, Compass, X } from 'lucide-react';
+import { Bookmark, Compass, X, LogIn } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import DestinationCard from '../components/DestinationCard';
 import EmptyState from '../components/EmptyState';
 import { destinations } from '../data/destinations';
 import { getSavedSlugs, removeSaved, onSavedChange } from '../utils/saved';
+import { getCurrentUser, onAuthChange } from '../utils/auth';
 import { usePageTitle } from '../hooks/usePageTitle';
 
 export default function SavedDestinations() {
   usePageTitle('Saved');
-  const [slugs, setSlugs] = useState(() => getSavedSlugs());
+  const [slugs, setSlugs] = useState([]);
+  const [user, setUser] = useState(null);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onSavedChange(() => setSlugs(getSavedSlugs()));
-    return unsubscribe;
+    const unsubAuth = onAuthChange((currentUser) => setUser(currentUser));
+    return unsubAuth;
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    function refresh() {
+      getSavedSlugs().then((result) => {
+        if (!cancelled) {
+          setSlugs(result);
+          setLoaded(true);
+        }
+      });
+    }
+    refresh();
+    const unsubscribe = onSavedChange(refresh);
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
+  }, [user]);
 
   const saved = slugs
     .map((slug) => destinations.find((d) => d.slug === slug))
@@ -42,7 +63,15 @@ export default function SavedDestinations() {
         images={headerImages}
       />
       <section className="mx-auto max-w-6xl px-6 pb-24 lg:px-10">
-        {saved.length > 0 ? (
+        {!loaded ? null : !user ? (
+          <EmptyState
+            icon={LogIn}
+            title="Log in to see your saved destinations."
+            description="Saved trips are tied to your account now, so they follow you across devices."
+            actionLabel="Log in"
+            actionTo="/login"
+          />
+        ) : saved.length > 0 ? (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {saved.map((d, i) => (
               <div key={d.slug} className="relative">

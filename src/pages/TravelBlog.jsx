@@ -4,16 +4,27 @@ import { Newspaper, ArrowRight, PenLine, Users, Trash2 } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import blogPosts from '../data/blogPosts';
 import { getCommunityPosts, onCommunityPostsChange, removeCommunityPost } from '../utils/communityPosts';
+import { getCurrentUser, onAuthChange } from '../utils/auth';
 import { usePageTitle } from '../hooks/usePageTitle';
 
 export default function TravelBlog() {
   usePageTitle('Travel Blog');
-  const [communityPosts, setCommunityPosts] = useState(() => getCommunityPosts());
+  const [communityPosts, setCommunityPosts] = useState([]);
+  const [user, setUser] = useState(null);
 
-  // Community posts are written on this device via /travel-blog/write, so
-  // refresh the list whenever one is added instead of only on first load.
   useEffect(() => {
-    const unsubscribe = onCommunityPostsChange(() => setCommunityPosts(getCommunityPosts()));
+    const unsubAuth = onAuthChange((currentUser) => setUser(currentUser));
+    return unsubAuth;
+  }, []);
+
+  // Community posts now live in Supabase and are visible to everyone, so
+  // refresh whenever anyone (on any device) adds, edits, or deletes one.
+  useEffect(() => {
+    function refresh() {
+      getCommunityPosts().then(setCommunityPosts);
+    }
+    refresh();
+    const unsubscribe = onCommunityPostsChange(refresh);
     return unsubscribe;
   }, []);
 
@@ -59,13 +70,13 @@ export default function TravelBlog() {
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {allPosts.map((post) => (
             <div key={post.slug} className="relative">
-              {post.isCommunity && (
+              {post.isCommunity && user && post.userId === user.id && (
                 <button
                   type="button"
-                  onClick={(e) => {
+                  onClick={async (e) => {
                     e.preventDefault();
                     if (window.confirm('Delete this story? This can\'t be undone.')) {
-                      removeCommunityPost(post.slug);
+                      await removeCommunityPost(post.slug);
                     }
                   }}
                   aria-label="Delete story"

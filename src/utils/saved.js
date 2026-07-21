@@ -1,43 +1,88 @@
-// Shared "saved destinations" store — localStorage-backed, same pattern as
-// utils/auth.js, so DestinationDetail's bookmark button and the /saved page
-// always agree on state and stay in sync via a custom event.
+import { supabase } from '../lib/supabase';
 
-const SAVED_KEY = 'voyora:saved-destinations';
 const SAVED_EVENT = 'voyora:saved-change';
 
-export function getSavedSlugs() {
-  try {
-    return JSON.parse(localStorage.getItem(SAVED_KEY) || '[]');
-  } catch {
-    return [];
+function notifyChange() {
+  window.dispatchEvent(new Event(SAVED_EVENT));
+}
+
+export async function getSavedSlugs() {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data, error } = await supabase
+    .from('saved_destinations')
+    .select('destination_slug')
+    .order('created_at', { ascending: false });
+
+  if (error) return [];
+  return data.map((row) => row.destination_slug);
+}
+
+export async function isSaved(slug) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return false;
+
+  const { data } = await supabase
+    .from('saved_destinations')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('destination_slug', slug)
+    .maybeSingle();
+
+  return Boolean(data);
+}
+
+// Toggles saved state for the current user. Returns { saved, error } —
+// error is set (and saved stays false) if nobody's logged in, so the UI can
+// prompt someone to log in instead of silently failing.
+export async function toggleSaved(slug) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { saved: false, error: 'Log in to save destinations.' };
   }
+
+  const { data: existing } = await supabase
+    .from('saved_destinations')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('destination_slug', slug)
+    .maybeSingle();
+
+  if (existing) {
+    await supabase.from('saved_destinations').delete().eq('id', existing.id);
+    notifyChange();
+    return { saved: false };
+  }
+
+  await supabase
+    .from('saved_destinations')
+    .insert({ user_id: user.id, destination_slug: slug });
+  notifyChange();
+  return { saved: true };
 }
 
-export function isSaved(slug) {
-  return getSavedSlugs().includes(slug);
-}
+export async function removeSaved(slug) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
 
-export function toggleSaved(slug) {
-  const current = getSavedSlugs();
-  const next = current.includes(slug)
-    ? current.filter((s) => s !== slug)
-    : [...current, slug];
-  localStorage.setItem(SAVED_KEY, JSON.stringify(next));
-  window.dispatchEvent(new Event(SAVED_EVENT));
-  return next.includes(slug);
-}
-
-export function removeSaved(slug) {
-  const current = getSavedSlugs();
-  localStorage.setItem(SAVED_KEY, JSON.stringify(current.filter((s) => s !== slug)));
-  window.dispatchEvent(new Event(SAVED_EVENT));
+  await supabase
+    .from('saved_destinations')
+    .delete()
+    .eq('user_id', user.id)
+    .eq('destination_slug', slug);
+  notifyChange();
 }
 
 export function onSavedChange(callback) {
   window.addEventListener(SAVED_EVENT, callback);
-  window.addEventListener('storage', callback);
-  return () => {
-    window.removeEventListener(SAVED_EVENT, callback);
-    window.removeEventListener('storage', callback);
-  };
+  return () => window.removeEventListener(SAVED_EVENT, callback);
 }

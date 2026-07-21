@@ -1,25 +1,48 @@
+import { useEffect, useState } from 'react';
 import { Link, useParams, Navigate, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Users, Trash2, PenLine } from 'lucide-react';
 import { getPostBySlug } from '../data/blogPosts';
 import { getCommunityPostBySlug, removeCommunityPost } from '../utils/communityPosts';
+import { getCurrentUser } from '../utils/auth';
 import ShareButton from '../components/ShareButton';
+import PageLoader from '../components/PageLoader';
 import { usePageTitle } from '../hooks/usePageTitle';
 
 export default function BlogPostDetail() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const officialPost = getPostBySlug(slug);
-  const communityPost = officialPost ? null : getCommunityPostBySlug(slug);
+
+  const [communityPost, setCommunityPost] = useState(null);
+  const [user, setUser] = useState(null);
+  const [loaded, setLoaded] = useState(Boolean(officialPost));
+
+  useEffect(() => {
+    if (officialPost) return;
+    let cancelled = false;
+    Promise.all([getCommunityPostBySlug(slug), getCurrentUser()]).then(([post, currentUser]) => {
+      if (cancelled) return;
+      setCommunityPost(post);
+      setUser(currentUser);
+      setLoaded(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [slug, officialPost]);
+
   const post = officialPost || communityPost;
   usePageTitle(post?.title);
 
+  if (!loaded) return <PageLoader />;
   if (!post) return <Navigate to="/travel-blog" replace />;
 
   const isCommunity = Boolean(communityPost);
+  const isOwner = isCommunity && user && post.userId === user.id;
 
-  function handleDelete() {
-    if (!window.confirm('Delete this story? This can\'t be undone.')) return;
-    removeCommunityPost(slug);
+  async function handleDelete() {
+    if (!window.confirm("Delete this story? This can't be undone.")) return;
+    await removeCommunityPost(slug);
     navigate('/travel-blog');
   }
 
@@ -48,7 +71,7 @@ export default function BlogPostDetail() {
           </Link>
           <div className="flex items-center gap-2">
             <ShareButton title={post.title} />
-            {isCommunity && (
+            {isOwner && (
               <>
                 <Link
                   to={`/travel-blog/write?edit=${slug}`}

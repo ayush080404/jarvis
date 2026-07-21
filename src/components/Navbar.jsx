@@ -22,21 +22,33 @@ export default function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const searchWrapRef = useRef(null);
   const navigate = useNavigate();
-  const [user, setUser] = useState(() => getCurrentUser());
-  const [savedCount, setSavedCount] = useState(() => getSavedSlugs().length);
+  const [user, setUser] = useState(null);
+  const [savedCount, setSavedCount] = useState(0);
 
   useEffect(() => {
-    const unsubscribe = onAuthChange(() => setUser(getCurrentUser()));
+    // onAuthChange fires immediately with the current session, then again
+    // on every future login/logout — no separate initial fetch needed.
+    const unsubscribe = onAuthChange((currentUser) => setUser(currentUser));
     return unsubscribe;
   }, []);
 
   useEffect(() => {
-    const unsubscribe = onSavedChange(() => setSavedCount(getSavedSlugs().length));
-    return unsubscribe;
-  }, []);
+    let cancelled = false;
+    function refreshSavedCount() {
+      getSavedSlugs().then((slugs) => {
+        if (!cancelled) setSavedCount(slugs.length);
+      });
+    }
+    refreshSavedCount();
+    const unsubscribe = onSavedChange(refreshSavedCount);
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
+  }, [user]);
 
-  function handleLogout() {
-    logout();
+  async function handleLogout() {
+    await logout();
     setMobileOpen(false);
     navigate('/');
   }

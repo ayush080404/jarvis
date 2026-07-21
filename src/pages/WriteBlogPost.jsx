@@ -1,42 +1,77 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { PenLine, Search, Check, X } from 'lucide-react';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { PenLine, Search, Check, X, LogIn } from 'lucide-react';
 import { destinations } from '../data/destinations';
 import {
   addCommunityPost,
   updateCommunityPost,
   getCommunityPostBySlug,
 } from '../utils/communityPosts';
+import { getCurrentUser, onAuthChange } from '../utils/auth';
+import PageLoader from '../components/PageLoader';
 import { usePageTitle } from '../hooks/usePageTitle';
 
 export default function WriteBlogPost() {
   const [searchParams] = useSearchParams();
   const editSlug = searchParams.get('edit');
-  const existingPost = editSlug ? getCommunityPostBySlug(editSlug) : null;
-  const isEditing = Boolean(existingPost);
-
-  usePageTitle(isEditing ? 'Edit Your Story' : 'Share Your Story');
   const navigate = useNavigate();
 
-  const [title, setTitle] = useState(existingPost?.title || '');
-  const [author, setAuthor] = useState(existingPost?.author || '');
-  const [body, setBody] = useState(existingPost?.body || '');
-  const [query, setQuery] = useState(existingPost?.destinationName || '');
-  const [destSlug, setDestSlug] = useState(() => {
-    if (!existingPost?.destinationName) return null;
-    return destinations.find((d) => d.name === existingPost.destinationName)?.slug || null;
-  });
-  const [error, setError] = useState('');
+  const [user, setUser] = useState(null);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [existingPost, setExistingPost] = useState(null);
+  const [postLoaded, setPostLoaded] = useState(!editSlug);
 
-  // If someone lands on ?edit=slug for a post that doesn't exist on this
-  // device (wrong browser, already deleted, etc.), send them back rather
-  // than showing a blank form pretending to edit something real.
   useEffect(() => {
-    if (editSlug && !existingPost) {
+    const unsubscribe = onAuthChange((currentUser) => {
+      setUser(currentUser);
+      setAuthChecked(true);
+    });
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    if (!editSlug) return;
+    let cancelled = false;
+    getCommunityPostBySlug(editSlug).then((post) => {
+      if (cancelled) return;
+      setExistingPost(post);
+      setPostLoaded(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [editSlug]);
+
+  const isEditing = Boolean(editSlug);
+  usePageTitle(isEditing ? 'Edit Your Story' : 'Share Your Story');
+
+  const [title, setTitle] = useState('');
+  const [body, setBody] = useState('');
+  const [query, setQuery] = useState('');
+  const [destSlug, setDestSlug] = useState(null);
+  const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Once the existing post loads (edit mode), prefill the form from it.
+  useEffect(() => {
+    if (!existingPost) return;
+    setTitle(existingPost.title);
+    setBody(existingPost.body);
+    setQuery(existingPost.destinationName || '');
+    const match = existingPost.destinationName
+      ? destinations.find((d) => d.name === existingPost.destinationName)
+      : null;
+    setDestSlug(match?.slug || null);
+  }, [existingPost]);
+
+  // If someone lands on ?edit=slug for a post that doesn't exist (deleted,
+  // typo'd, etc.), send them back rather than showing a blank form
+  // pretending to edit something real.
+  useEffect(() => {
+    if (postLoaded && editSlug && !existingPost) {
       navigate('/travel-blog', { replace: true });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editSlug]);
+  }, [postLoaded, editSlug, existingPost, navigate]);
 
   const matches = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -56,12 +91,12 @@ export default function WriteBlogPost() {
     setQuery('');
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setError('');
 
-    if (!title.trim() || !author.trim() || !body.trim()) {
-      setError('Fill in a title, your name, and your story before posting.');
+    if (!title.trim() || !body.trim()) {
+      setError('Fill in a title and your story before posting.');
       return;
     }
     if (body.trim().length < 40) {
@@ -69,27 +104,50 @@ export default function WriteBlogPost() {
       return;
     }
 
-    if (isEditing) {
-      const updated = updateCommunityPost(existingPost.slug, {
-        title,
-        author,
-        body,
-        coverImage: selectedDestination?.heroImage ?? null,
-        destinationName: selectedDestination?.name ?? null,
-      });
-      navigate(`/travel-blog/${updated.slug}`);
+    setIsSubmitting(true);
+    const payload = {
+      title,
+      body,
+      coverImage: selectedDestination?.heroImage ?? null,
+      destinationName: selectedDestination?.name ?? null,
+    };
+
+    const result = isEditing
+      ? await updateCommunityPost(existingPost.slug, payload)
+      : await addCommunityPost(payload);
+
+    setIsSubmitting(false);
+
+    if (result.error) {
+      setError(result.error);
       return;
     }
+    navigate(`/travel-blog/${result.post.slug}`);
+  }
 
-    const post = addCommunityPost({
-      title,
-      author,
-      body,
-      coverImage: selectedDestination?.heroImage || null,
-      destinationName: selectedDestination?.name || null,
-    });
+  if (!authChecked || !postLoaded) return <PageLoader />;
 
-    navigate(`/travel-blog/${post.slug}`);
+  if (!user) {
+    return (
+      <section className="mx-auto max-w-lg px-6 pb-24 pt-32 text-center lg:px-10 lg:pt-40">
+        <span className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-full bg-(--surface-card-hover) text-(--text-secondary)">
+          <LogIn size={20} />
+        </span>
+        <h1 className="font-display text-2xl font-bold text-(--text-primary)">
+          Log in to share a story
+        </h1>
+        <p className="mt-3 text-(--text-secondary)">
+          Stories are tied to your account now, so you can edit or delete them later from any
+          device.
+        </p>
+        <Link
+          to="/login"
+          className="btn-gradient mt-6 inline-flex items-center rounded-xl px-6 py-3 text-sm font-semibold text-white"
+        >
+          Log in
+        </Link>
+      </section>
+    );
   }
 
   return (
@@ -105,8 +163,8 @@ export default function WriteBlogPost() {
       </h1>
       <p className="mt-3 text-(--text-secondary)">
         {isEditing
-          ? 'Update your story below — changes save on this device.'
-          : "Write about a trip you loved. Your story is saved on this device and shows up alongside Voyora's guides on the Travel Blog page."}
+          ? 'Update your story below.'
+          : `Write about a trip you loved. It'll be posted as ${user.name} and show up alongside Voyora's guides on the Travel Blog page.`}
       </p>
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-5 rounded-3xl border border-(--border-soft) bg-(--surface-card) p-6">
@@ -119,19 +177,6 @@ export default function WriteBlogPost() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="e.g. Getting lost (on purpose) in Kyoto"
-            className="w-full rounded-xl border border-(--border-soft) bg-(--input-bg) px-4 py-2.5 text-sm text-(--text-primary) placeholder:text-(--text-secondary) transition-colors focus:border-(--border-mid) focus:outline-none"
-          />
-        </div>
-
-        <div>
-          <label className="mb-1.5 block text-sm font-medium text-(--text-secondary)">
-            Your name
-          </label>
-          <input
-            type="text"
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-            placeholder="e.g. Priya M."
             className="w-full rounded-xl border border-(--border-soft) bg-(--input-bg) px-4 py-2.5 text-sm text-(--text-primary) placeholder:text-(--text-secondary) transition-colors focus:border-(--border-mid) focus:outline-none"
           />
         </div>
@@ -201,9 +246,10 @@ export default function WriteBlogPost() {
 
         <button
           type="submit"
-          className="btn-gradient w-full rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-[0_0_25px_rgba(59,130,246,0.35)] transition-transform hover:scale-[1.01] sm:w-auto"
+          disabled={isSubmitting}
+          className="btn-gradient w-full rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-[0_0_25px_rgba(59,130,246,0.35)] transition-transform hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
         >
-          {isEditing ? 'Save changes' : 'Post my story'}
+          {isSubmitting ? 'Saving...' : isEditing ? 'Save changes' : 'Post my story'}
         </button>
       </form>
     </section>

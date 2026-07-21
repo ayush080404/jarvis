@@ -21,28 +21,48 @@ import { usePageTitle } from '../hooks/usePageTitle';
 export default function MyVoyora() {
   usePageTitle('My Voyora');
 
-  const [user, setUser] = useState(() => getCurrentUser());
-  const [savedSlugs, setSavedSlugs] = useState(() => getSavedSlugs());
-  const [posts, setPosts] = useState(() => getCommunityPosts());
+  const [user, setUser] = useState(null);
+  const [savedSlugs, setSavedSlugs] = useState([]);
+  const [allPosts, setAllPosts] = useState([]);
 
   useEffect(() => {
-    const unsub1 = onAuthChange(() => setUser(getCurrentUser()));
-    const unsub2 = onSavedChange(() => setSavedSlugs(getSavedSlugs()));
-    const unsub3 = onCommunityPostsChange(() => setPosts(getCommunityPosts()));
-    return () => {
-      unsub1();
-      unsub2();
-      unsub3();
-    };
+    const unsubAuth = onAuthChange((currentUser) => setUser(currentUser));
+    return unsubAuth;
   }, []);
+
+  useEffect(() => {
+    function refreshSaved() {
+      getSavedSlugs().then(setSavedSlugs);
+    }
+    refreshSaved();
+    const unsub = onSavedChange(refreshSaved);
+    return unsub;
+  }, [user]);
+
+  useEffect(() => {
+    function refreshPosts() {
+      getCommunityPosts().then(setAllPosts);
+    }
+    refreshPosts();
+    const unsub = onCommunityPostsChange(refreshPosts);
+    return unsub;
+  }, []);
+
+  // Community posts are public to everyone now (it's a real blog), so this
+  // dashboard filters down to just the ones this account actually wrote.
+  const posts = user ? allPosts.filter((p) => p.userId === user.id) : [];
 
   const savedDestinations = savedSlugs
     .map((slug) => destinations.find((d) => d.slug === slug))
     .filter(Boolean);
 
-  function handleDeletePost(slug) {
+  async function handleDeletePost(slug) {
     if (!window.confirm('Delete this story? This can\'t be undone.')) return;
-    removeCommunityPost(slug);
+    await removeCommunityPost(slug);
+  }
+
+  async function handleLogout() {
+    await logout();
   }
 
   return (
@@ -80,14 +100,14 @@ export default function MyVoyora() {
                   Not logged in
                 </p>
                 <p className="text-sm text-(--text-secondary)">
-                  Saved trips and stories below still work without an account.
+                  Log in to see your saved trips and stories below.
                 </p>
               </div>
             )}
           </div>
           {user ? (
             <button
-              onClick={logout}
+              onClick={handleLogout}
               className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-(--border-soft) px-4 py-2 text-sm font-medium text-(--text-primary) transition-colors hover:border-(--border-mid)"
             >
               <LogOut size={14} />

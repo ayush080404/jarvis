@@ -12,10 +12,14 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    const result = login({ email, password });
+    setError('');
+    setIsSubmitting(true);
+    const result = await login({ email, password });
+    setIsSubmitting(false);
     if (result.error) {
       setError(result.error);
       return;
@@ -64,7 +68,6 @@ export default function Login() {
         <div>
           <div className="mb-1.5 flex items-center justify-between">
             <label className="block text-sm font-medium text-(--text-secondary)">Password</label>
-            <span className="text-xs font-medium text-(--text-secondary)">Demo mode</span>
           </div>
           <div className="flex items-center gap-2.5 rounded-xl border border-(--border-soft) bg-(--input-bg) px-4 py-2.5 transition-colors focus-within:border-(--border-mid)">
             <Lock size={16} className="shrink-0 text-(--text-secondary)" />
@@ -90,14 +93,11 @@ export default function Login() {
 
         <button
           type="submit"
-          className="btn-gradient w-full rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-[0_0_25px_rgba(59,130,246,0.35)] transition-transform hover:scale-[1.01]"
+          disabled={isSubmitting}
+          className="btn-gradient w-full rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-[0_0_25px_rgba(59,130,246,0.35)] transition-transform hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-60"
         >
-          Log in
+          {isSubmitting ? 'Logging in...' : 'Log in'}
         </button>
-
-        <p className="text-center text-xs text-(--text-secondary)">
-          Accounts are stored only in this browser for now — there&apos;s no real backend yet.
-        </p>
       </form>
 
       <div className="my-6 flex items-center gap-3">
