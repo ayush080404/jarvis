@@ -24,6 +24,8 @@ const SavedDestinations = lazy(() => import('./pages/SavedDestinations'));
 const MyVoyora = lazy(() => import('./pages/MyVoyora'));
 const Login = lazy(() => import('./pages/Login'));
 const Signup = lazy(() => import('./pages/Signup'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 export default function App() {
@@ -32,6 +34,8 @@ export default function App() {
       <Routes>
         <Route path="login" element={<Login />} />
         <Route path="signup" element={<Signup />} />
+        <Route path="forgot-password" element={<ForgotPassword />} />
+        <Route path="reset-password" element={<ResetPassword />} />
         <Route element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="explore" element={<Explore />} />

@@ -68,6 +68,9 @@ export default function Login() {
         <div>
           <div className="mb-1.5 flex items-center justify-between">
             <label className="block text-sm font-medium text-(--text-secondary)">Password</label>
+            <Link to="/forgot-password" className="text-xs font-medium text-sky-500 hover:underline">
+              Forgot password?
+            </Link>
           </div>
           <div className="flex items-center gap-2.5 rounded-xl border border-(--border-soft) bg-(--input-bg) px-4 py-2.5 transition-colors focus-within:border-(--border-mid)">
             <Lock size={16} className="shrink-0 text-(--text-secondary)" />
