@@ -50,6 +50,34 @@ export async function logout() {
   await supabase.auth.signOut();
 }
 
+// Sends a reset link to the user's email. Supabase's redirectTo must be an
+// allowed URL in the project's Auth settings, or the link will 400 silently
+// on click even though this call succeeds.
+export async function requestPasswordReset(email) {
+  if (!/^\S+@\S+\.\S+$/.test(email || '')) return { error: 'Enter a valid email address.' };
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
+    redirectTo: `${window.location.origin}/reset-password`,
+  });
+
+  // Don't leak whether the email exists — always report success to the UI.
+  if (error) return { error: error.message };
+  return { success: true };
+}
+
+// Called from the /reset-password page after the user arrives via the email
+// link. Supabase's client automatically turns that link's URL fragment into
+// a temporary recovery session (detectSessionInUrl is on by default), so
+// this just needs to update the password on that session.
+export async function updatePassword(newPassword) {
+  if (!newPassword || newPassword.length < 6) {
+    return { error: 'Password must be at least 6 characters.' };
+  }
+  const { error } = await supabase.auth.updateUser({ password: newPassword });
+  if (error) return { error: error.message };
+  return { success: true };
+}
+
 export async function getCurrentUser() {
   const { data } = await supabase.auth.getUser();
   return mapUser(data.user);
