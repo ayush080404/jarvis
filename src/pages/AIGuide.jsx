@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Sparkles,
@@ -37,19 +37,52 @@ const CAPABILITIES = [
   },
 ];
 
+const GREETING = "Hi! Tell me where you're headed and I'll help you plan the details.";
+
 export default function AIGuide() {
   usePageTitle('AI Guide');
   const [input, setInput] = useState('');
-  const [showComingSoon, setShowComingSoon] = useState(false);
+  const [messages, setMessages] = useState([{ role: 'assistant', content: GREETING }]);
+  const [isSending, setIsSending] = useState(false);
+  const [error, setError] = useState('');
+  const scrollRef = useRef(null);
 
-  function handleSend(e) {
+  useEffect(() => {
+    scrollRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }, [messages, isSending]);
+
+  async function handleSend(e) {
     e.preventDefault();
-    if (!input.trim()) return;
-    // AI Guide's real logic isn't wired up yet — this is a UI-only preview
-    // for now, so sending just surfaces an honest "coming soon" instead of
-    // silently doing nothing or faking a response.
-    setShowComingSoon(true);
-    window.setTimeout(() => setShowComingSoon(false), 3200);
+    const trimmedInput = input.trim();
+    if (!trimmedInput || isSending) return;
+
+    setError('');
+    const nextMessages = [...messages, { role: 'user', content: trimmedInput }];
+    setMessages(nextMessages);
+    setInput('');
+    setIsSending(true);
+
+    try {
+      const response = await fetch('/api/ai-guide', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: nextMessages }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.error || 'AI Guide had trouble responding.');
+      }
+
+      setMessages([...nextMessages, { role: 'assistant', content: data.reply }]);
+    } catch (err) {
+      // Keep the user's message in the thread and surface the error
+      // separately, rather than silently dropping what they typed.
+      setError(err.message || 'Something went wrong. Please try again.');
+    } finally {
+      setIsSending(false);
+    }
   }
 
   return (
@@ -70,32 +103,49 @@ export default function AIGuide() {
       <section className="mx-auto max-w-2xl px-6 pb-24 lg:px-10">
         <div className="inline-flex items-center gap-1.5 rounded-full border border-(--border-soft) bg-(--surface-card) px-3 py-1 text-xs font-medium text-(--text-secondary)">
           <Sparkles size={12} className="text-sky-400" />
-          Preview &mdash; full AI answers are coming soon
+          Answers are AI-generated — always confirm visa & entry rules officially
         </div>
 
         <div className="mt-4 overflow-hidden rounded-3xl border border-(--border-soft) bg-(--surface-card)">
-          <div className="space-y-4 p-6">
-            <div className="flex items-start gap-3">
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-sky-400 to-violet-500">
-                <Sparkles size={16} className="text-white" />
-              </span>
-              <div className="rounded-2xl rounded-tl-sm bg-(--surface-card-hover) px-4 py-3 text-sm text-(--text-primary)">
-                Hi! Tell me where you're headed and I'll help you plan the details.
-              </div>
-            </div>
+          <div className="max-h-[420px] space-y-4 overflow-y-auto p-6">
+            {messages.map((m, i) =>
+              m.role === 'assistant' ? (
+                <div key={i} className="page-transition flex items-start gap-3">
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-sky-400 to-violet-500">
+                    <Sparkles size={16} className="text-white" />
+                  </span>
+                  <div className="max-w-[85%] whitespace-pre-wrap rounded-2xl rounded-tl-sm bg-(--surface-card-hover) px-4 py-3 text-sm text-(--text-primary)">
+                    {m.content}
+                  </div>
+                </div>
+              ) : (
+                <div key={i} className="page-transition flex items-start justify-end gap-3">
+                  <div className="max-w-[85%] whitespace-pre-wrap rounded-2xl rounded-tr-sm bg-gradient-to-br from-blue-500 to-violet-500 px-4 py-3 text-sm text-white">
+                    {m.content}
+                  </div>
+                </div>
+              )
+            )}
 
-            {showComingSoon && (
-              <div className="page-transition flex items-start gap-3">
+            {isSending && (
+              <div className="flex items-start gap-3">
                 <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-sky-400 to-violet-500">
                   <Sparkles size={16} className="text-white" />
                 </span>
-                <div className="rounded-2xl rounded-tl-sm bg-(--surface-card-hover) px-4 py-3 text-sm text-(--text-primary)">
-                  I'm still being built — real answers are coming soon! In the meantime, try{' '}
-                  <span className="font-medium">Trip Planner</span> or browse{' '}
-                  <span className="font-medium">Destinations</span> for real guides.
+                <div className="flex items-center gap-1.5 rounded-2xl rounded-tl-sm bg-(--surface-card-hover) px-4 py-3">
+                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-(--text-secondary) [animation-delay:-0.3s]" />
+                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-(--text-secondary) [animation-delay:-0.15s]" />
+                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-(--text-secondary)" />
                 </div>
               </div>
             )}
+
+            {error && (
+              <p className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-2.5 text-sm text-rose-400">
+                {error}
+              </p>
+            )}
+            <div ref={scrollRef} />
           </div>
 
           <div className="border-t border-(--border-soft) p-4">
@@ -121,12 +171,14 @@ export default function AIGuide() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="e.g. What should I pack for Tokyo in November?"
-                className="w-full bg-transparent text-sm text-(--text-primary) placeholder:text-(--text-secondary) focus:outline-none"
+                disabled={isSending}
+                className="w-full bg-transparent text-sm text-(--text-primary) placeholder:text-(--text-secondary) focus:outline-none disabled:opacity-60"
               />
               <button
                 type="submit"
                 aria-label="Send"
-                className="btn-gradient grid h-9 w-9 shrink-0 place-items-center rounded-xl text-white transition-transform hover:scale-105"
+                disabled={isSending || !input.trim()}
+                className="btn-gradient grid h-9 w-9 shrink-0 place-items-center rounded-xl text-white transition-transform hover:scale-105 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
               >
                 <Send size={15} />
               </button>
@@ -160,11 +212,11 @@ export default function AIGuide() {
         <div className="mt-8 flex items-start gap-3 rounded-2xl border border-(--border-soft) bg-(--surface-card) p-5">
           <Plane size={18} className="mt-0.5 shrink-0 text-sky-400" />
           <p className="text-sm text-(--text-secondary)">
-            In the meantime,{' '}
+            Once you've got a plan,{' '}
             <Link to="/trip-planner" className="font-medium text-(--text-primary) underline-offset-4 hover:underline">
               Trip Planner
             </Link>{' '}
-            already builds a real starter itinerary from Voyora's destination guides.
+            can turn it into a real day-by-day itinerary from Voyora's destination guides.
           </p>
         </div>
       </section>

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Bookmark, Compass, X, LogIn } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import DestinationCard from '../components/DestinationCard';
+import SkeletonCard from '../components/SkeletonCard';
 import EmptyState from '../components/EmptyState';
 import { destinations } from '../data/destinations';
 import { getSavedSlugs, removeSaved, onSavedChange } from '../utils/saved';
@@ -59,11 +60,17 @@ export default function SavedDestinations() {
         icon={Bookmark}
         eyebrow={`${saved.length} saved`}
         title="Your saved destinations"
-        subtitle="Everything you've bookmarked, kept in this browser so you can pick up planning anytime."
+        subtitle="Everything you've bookmarked, tied to your account so it follows you across devices."
         images={headerImages}
       />
       <section className="mx-auto max-w-6xl px-6 pb-24 lg:px-10">
-        {!loaded ? null : !user ? (
+        {!loaded ? (
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+          </div>
+        ) : !user ? (
           <EmptyState
             icon={LogIn}
             title="Log in to see your saved destinations."

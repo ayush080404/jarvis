@@ -14,6 +14,7 @@ import {
   Layers,
 } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
+import EmptyState from '../components/EmptyState';
 import { destinations } from '../data/destinations';
 import { usePageTitle } from '../hooks/usePageTitle';
 
@@ -233,9 +234,13 @@ export default function Compare() {
             </table>
           </div>
         ) : (
-          <p className="mt-10 text-center text-sm text-(--text-secondary)">
-            Add at least 2 destinations above to see them compared.
-          </p>
+          <div className="mt-10">
+            <EmptyState
+              icon={GitCompare}
+              title="Add at least 2 destinations to compare."
+              description="Pick from the slots above to see season, cost, pace, and more side by side."
+            />
+          </div>
         )}
       </section>
     </>

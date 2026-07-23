@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import DestinationCard from '../components/DestinationCard';
+import SkeletonCard from '../components/SkeletonCard';
 import EmptyState from '../components/EmptyState';
 import { destinations } from '../data/destinations';
 import { getCurrentUser, logout, onAuthChange } from '../utils/auth';
@@ -24,6 +25,11 @@ export default function MyVoyora() {
   const [user, setUser] = useState(null);
   const [savedSlugs, setSavedSlugs] = useState([]);
   const [allPosts, setAllPosts] = useState([]);
+  // Separately tracked so a real-time refresh (someone saves a destination
+  // in another tab) never re-triggers the skeleton — only the very first
+  // load per section should show it.
+  const [savedLoaded, setSavedLoaded] = useState(false);
+  const [postsLoaded, setPostsLoaded] = useState(false);
 
   useEffect(() => {
     const unsubAuth = onAuthChange((currentUser) => setUser(currentUser));
@@ -32,7 +38,10 @@ export default function MyVoyora() {
 
   useEffect(() => {
     function refreshSaved() {
-      getSavedSlugs().then(setSavedSlugs);
+      getSavedSlugs().then((result) => {
+        setSavedSlugs(result);
+        setSavedLoaded(true);
+      });
     }
     refreshSaved();
     const unsub = onSavedChange(refreshSaved);
@@ -41,7 +50,10 @@ export default function MyVoyora() {
 
   useEffect(() => {
     function refreshPosts() {
-      getCommunityPosts().then(setAllPosts);
+      getCommunityPosts().then((result) => {
+        setAllPosts(result);
+        setPostsLoaded(true);
+      });
     }
     refreshPosts();
     const unsub = onCommunityPostsChange(refreshPosts);
@@ -71,7 +83,7 @@ export default function MyVoyora() {
         icon={LayoutDashboard}
         eyebrow="Your hub"
         title="My Voyora"
-        subtitle="Your account, saved trips, and stories, all kept in this browser."
+        subtitle="Your account, saved trips, and stories, all tied to your account."
         images={[
           '/images/paris.jpg',
           '/images/fuji_cherry_blossoms.jpg',
@@ -143,7 +155,13 @@ export default function MyVoyora() {
             )}
           </div>
 
-          {savedDestinations.length > 0 ? (
+          {!savedLoaded ? (
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <SkeletonCard />
+              <SkeletonCard />
+              <SkeletonCard />
+            </div>
+          ) : savedDestinations.length > 0 ? (
             <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {savedDestinations.slice(0, 3).map((d, i) => (
                 <DestinationCard key={d.slug} destination={d} priority={i === 0} isLCP={i === 0} />
@@ -180,7 +198,20 @@ export default function MyVoyora() {
             </Link>
           </div>
 
-          {posts.length > 0 ? (
+          {!postsLoaded ? (
+            <div className="mt-4 space-y-2.5">
+              {[0, 1].map((i) => (
+                <div
+                  key={i}
+                  className="animate-pulse rounded-xl border border-(--border-soft) bg-(--surface-card) p-4"
+                  aria-hidden="true"
+                >
+                  <div className="h-3.5 w-1/3 rounded bg-(--surface-card-hover)" />
+                  <div className="mt-2 h-3 w-20 rounded bg-(--surface-card-hover)" />
+                </div>
+              ))}
+            </div>
+          ) : posts.length > 0 ? (
             <div className="mt-4 space-y-2.5">
               {posts.map((post) => (
                 <div

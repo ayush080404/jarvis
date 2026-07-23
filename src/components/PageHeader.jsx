@@ -14,7 +14,7 @@ export default function PageHeader({ icon: Icon, eyebrow, title, subtitle, image
               'linear-gradient(to top, var(--surface) 5%, rgba(0,0,0,0.45) 45%, rgba(0,0,0,0.25) 100%)',
           }}
         />
-        <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
+        <div className="absolute inset-0 flex flex-col items-center justify-center px-6 pt-24 text-center sm:pt-28">
           {eyebrow && (
             <p className="text-xs font-semibold uppercase tracking-widest text-sky-300">
               {eyebrow}
