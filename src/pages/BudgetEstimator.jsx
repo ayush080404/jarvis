@@ -288,7 +288,7 @@ export default function BudgetEstimator() {
                   </div>
 
                   <Link
-                    to={`/trip-planner?slug=${destination.slug}`}
+                    to={`/trip-planner?destination=${destination.slug}`}
                     className="mt-5 inline-block text-sm font-medium text-sky-500 hover:underline"
                   >
                     Build a full itinerary for {destination.name} &rarr;

@@ -64,7 +64,7 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6 lg:px-10">
+    <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6 lg:px-10" data-print-hide>
       <nav
         className={[
           'liquid-glass relative mx-auto flex max-w-6xl items-center justify-between gap-6 rounded-3xl px-5 py-3 transition-[background-color,box-shadow,border-color] duration-300 sm:rounded-full',

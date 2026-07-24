@@ -268,3 +268,33 @@ body::after {
 .mountains svg polygon {
   transition: fill 0.5s ease, opacity 0.5s ease;
 }
+
+/* Trip Planner itinerary "Save as PDF" (via window.print()). Anything
+   marked data-print-hide is UI chrome (nav, form inputs, buttons) that
+   shouldn't end up in the exported document; data-print-only is the
+   inverse, content that exists purely for the printed version. */
+@media print {
+  [data-print-hide] {
+    display: none !important;
+  }
+  [data-print-only] {
+    display: block !important;
+  }
+  /* Force light-theme values regardless of the active site theme — the
+     itinerary card's text/border colors come from these variables, so
+     overriding `body { color }` alone wouldn't do anything: printing in
+     dark mode would otherwise put near-white text on a white page. */
+  html {
+    --surface: #eef3fa;
+    --surface-strong: #eef2f8;
+    --surface-card: rgba(28, 38, 58, 0.035);
+    --surface-card-hover: rgba(28, 38, 58, 0.06);
+    --text-primary: #232c3d;
+    --text-secondary: #5c6780;
+    --border-soft: rgba(28, 38, 58, 0.15);
+    --border-mid: rgba(28, 38, 58, 0.25);
+  }
+  body {
+    background: white;
+  }
+}

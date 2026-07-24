@@ -1,13 +1,64 @@
-import { CalendarDays, Sparkles, UtensilsCrossed } from 'lucide-react';
+import { useState } from 'react';
+import { CalendarDays, Sparkles, UtensilsCrossed, Share2, Printer, Check } from 'lucide-react';
 
-export default function ItineraryResult({ itinerary }) {
+export default function ItineraryResult({ itinerary, shareUrl }) {
+  const [copied, setCopied] = useState(false);
   if (!itinerary) return null;
   const { legs, totalDays } = itinerary;
 
+  async function handleShare() {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard API can fail (permissions, insecure context) — fall back
+      // to selecting the text isn't practical here, so just let the person
+      // know rather than silently doing nothing.
+      window.prompt('Copy this link:', shareUrl);
+    }
+  }
+
   return (
     <div className="page-transition mt-8 space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-3" data-print-hide>
+        {legs.length > 1 ? (
+          <p className="text-sm font-medium text-(--text-secondary)">
+            {totalDays} days across {legs.length} destinations
+          </p>
+        ) : (
+          <span />
+        )}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleShare}
+            className="flex items-center gap-1.5 rounded-full border border-(--border-soft) px-3.5 py-1.5 text-xs font-medium text-(--text-secondary) transition-colors hover:border-(--border-mid) hover:text-(--text-primary)"
+          >
+            {copied ? <Check size={13} className="text-emerald-500" /> : <Share2 size={13} />}
+            {copied ? 'Link copied' : 'Share'}
+          </button>
+          <button
+            type="button"
+            onClick={() => window.print()}
+            className="flex items-center gap-1.5 rounded-full border border-(--border-soft) px-3.5 py-1.5 text-xs font-medium text-(--text-secondary) transition-colors hover:border-(--border-mid) hover:text-(--text-primary)"
+          >
+            <Printer size={13} />
+            Save as PDF
+          </button>
+        </div>
+      </div>
+
+      <div className="hidden" data-print-only>
+        <h1 className="font-display text-2xl font-bold">Voyora — Trip Itinerary</h1>
+        <p className="mt-1 text-sm text-(--text-secondary)">
+          {legs.map((l) => l.destination.name).join(' → ')} &middot; {totalDays} day
+          {totalDays > 1 ? 's' : ''}
+        </p>
+      </div>
+
       {legs.length > 1 && (
-        <p className="text-sm font-medium text-(--text-secondary)">
+        <p className="hidden text-sm font-medium text-(--text-secondary)" data-print-only>
           {totalDays} days across {legs.length} destinations
         </p>
       )}

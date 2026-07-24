@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
-import { Mic, Compass, BookMarked, MapPinned, Globe } from 'lucide-react';
+import { Mic, Compass, BookMarked, MapPinned, Globe, ChevronDown } from 'lucide-react';
 import MountainsSilhouette from './MountainsSilhouette';
 import SearchBox from './SearchBox';
 import { destinations } from '../data/destinations';
@@ -100,14 +100,18 @@ export default function Hero() {
 
       <MountainsSilhouette />
 
-      <div className="relative z-10 mx-auto flex max-w-7xl justify-start px-6 pb-6 text-xs text-(--text-secondary) lg:px-10">
-        <div className="flex flex-col items-center gap-1">
-          <span className="grid h-9 w-6 place-items-start rounded-full border border-(--border-mid) p-1">
-            <span className="h-1.5 w-1 rounded-full bg-(--text-secondary)" />
-          </span>
-          Scroll to Explore
-        </div>
-      </div>
+      <button
+        type="button"
+        onClick={() =>
+          window.scrollTo({ top: window.innerHeight * 0.85, behavior: 'smooth' })
+        }
+        className="absolute inset-x-0 bottom-6 z-10 mx-auto flex w-fit flex-col items-center gap-1.5 text-xs text-(--text-secondary) transition-colors hover:text-(--text-primary)"
+      >
+        <span className="font-medium">See what else Voyora can do</span>
+        <span className="animate-bounce">
+          <ChevronDown size={18} />
+        </span>
+      </button>
     </section>
   );
 }
