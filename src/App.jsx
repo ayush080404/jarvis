@@ -15,6 +15,7 @@ const DestinationsPage = lazy(() => import('./pages/DestinationsPage'));
 const Compare = lazy(() => import('./pages/Compare'));
 const DestinationDetail = lazy(() => import('./pages/DestinationDetail'));
 const TripPlanner = lazy(() => import('./pages/TripPlanner'));
+const BudgetEstimator = lazy(() => import('./pages/BudgetEstimator'));
 const AIGuide = lazy(() => import('./pages/AIGuide'));
 const TravelBlog = lazy(() => import('./pages/TravelBlog'));
 const BlogPostDetail = lazy(() => import('./pages/BlogPostDetail'));
@@ -43,6 +44,7 @@ export default function App() {
           <Route path="compare" element={<Compare />} />
           <Route path="destinations/:slug" element={<DestinationDetail />} />
           <Route path="trip-planner" element={<TripPlanner />} />
+          <Route path="budget-estimator" element={<BudgetEstimator />} />
           <Route path="ai-guide" element={<AIGuide />} />
           <Route path="travel-blog" element={<TravelBlog />} />
           <Route path="travel-blog/write" element={<WriteBlogPost />} />

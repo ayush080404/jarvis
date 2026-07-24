@@ -15,8 +15,10 @@ import {
   Bookmark,
   BookmarkCheck,
   Map as MapIcon,
+  Wallet,
 } from 'lucide-react';
 import { destinations, getDestinationBySlug } from '../data/destinations';
+import { tripBudgets } from '../data/tripBudgets';
 import DestinationCard from '../components/DestinationCard';
 import ShareButton from '../components/ShareButton';
 import PackingChecklist from '../components/PackingChecklist';
@@ -335,6 +337,28 @@ export default function DestinationDetail() {
                 source before booking.
               </p>
             </div>
+          )}
+
+          {tripBudgets[slug] && (
+            <Link
+              to={`/budget-estimator?slug=${slug}`}
+              className="mt-4 flex items-center gap-3 rounded-2xl border border-(--border-soft) bg-(--surface-card) p-5 transition-colors hover:border-(--border-mid)"
+            >
+              <span
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-blue-500/20 to-violet-500/20"
+                style={{ color: accentColor }}
+              >
+                <Wallet size={16} />
+              </span>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-(--text-primary)">
+                  What will this trip cost?
+                </p>
+                <p className="text-xs text-(--text-secondary)">
+                  Get a rough budget estimate for {destination.name}
+                </p>
+              </div>
+            </Link>
           )}
         </div>
 

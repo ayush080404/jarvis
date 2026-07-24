@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { CalendarRange, MapPin, Wallet, Check, Search, Loader2, X, Plus } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import ItineraryResult from '../components/ItineraryResult';
 import { destinations } from '../data/destinations';
+import { tripBudgets } from '../data/tripBudgets';
 import { buildItinerary, buildMultiItinerary, TRIP_STYLES } from '../utils/itinerary';
 import { usePageTitle } from '../hooks/usePageTitle';
 
@@ -287,20 +288,32 @@ export default function TripPlanner() {
           </div>
         </div>
 
-        <button
-          onClick={generate}
-          disabled={selectedDestinations.length === 0 || isGenerating}
-          className="btn-gradient mt-8 flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-sm font-semibold text-white shadow-[0_0_25px_rgba(59,130,246,0.35)] transition-transform hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100 sm:w-auto"
-        >
-          {isGenerating ? (
-            <>
-              <Loader2 size={16} className="animate-spin" />
-              Generating...
-            </>
-          ) : (
-            'Generate my itinerary'
+        <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+          <button
+            onClick={generate}
+            disabled={selectedDestinations.length === 0 || isGenerating}
+            className="btn-gradient flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-sm font-semibold text-white shadow-[0_0_25px_rgba(59,130,246,0.35)] transition-transform hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:scale-100"
+          >
+            {isGenerating ? (
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                Generating...
+              </>
+            ) : (
+              'Generate my itinerary'
+            )}
+          </button>
+
+          {selectedDestinations.length > 0 && tripBudgets[selectedDestinations[0].slug] && (
+            <Link
+              to={`/budget-estimator?slug=${selectedDestinations[0].slug}`}
+              className="flex items-center gap-1.5 text-sm font-medium text-sky-500 hover:underline"
+            >
+              <Wallet size={14} />
+              What will this cost?
+            </Link>
           )}
-        </button>
+        </div>
 
         {isGenerating && (
           <div className="mt-8 animate-pulse rounded-3xl border border-(--border-soft) bg-(--surface-card) p-6">
