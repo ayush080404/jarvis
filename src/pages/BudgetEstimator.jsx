@@ -4,6 +4,7 @@ import { Search, Wallet, Users, CalendarDays, Home, Utensils, Bus, Ticket, Info 
 import PageHeader from '../components/PageHeader';
 import { destinations } from '../data/destinations';
 import { tripBudgets, TIERS } from '../data/tripBudgets';
+import { slugToCurrency, formatLocalAmount } from '../data/currencyRates';
 import { estimateTripCost, parseIdealStayDays } from '../utils/budgetEstimator';
 import { usePageTitle } from '../hooks/usePageTitle';
 
@@ -30,6 +31,25 @@ export default function BudgetEstimator() {
   const [days, setDays] = useState(preselected ? parseIdealStayDays(preselected.idealStay) : 5);
   const [travelers, setTravelers] = useState(1);
   const [tier, setTier] = useState('midRange');
+  const [showLocal, setShowLocal] = useState(false);
+
+  // A different destination means a different local currency (or none, for
+  // USD-priced places like New York) — always reset to USD rather than
+  // silently showing e.g. Yen amounts under a Paris estimate.
+  useEffect(() => {
+    setShowLocal(false);
+  }, [destination]);
+
+  const localCurrencyCode = destination ? slugToCurrency[destination.slug] : null;
+  const hasLocalCurrency = localCurrencyCode && localCurrencyCode !== 'USD';
+
+  function displayAmount(usdValue) {
+    if (showLocal && destination) {
+      const local = formatLocalAmount(usdValue, destination.slug);
+      if (local) return `${local.symbol}${local.amount.toLocaleString()}`;
+    }
+    return `$${usdValue.toLocaleString()}`;
+  }
 
   // If someone arrives via a "Estimate this trip" link from a different
   // destination page later in the same session, keep the form in sync.
@@ -200,19 +220,48 @@ export default function BudgetEstimator() {
             ) : (
               estimate && (
                 <>
-                  <div className="mt-5 rounded-2xl bg-gradient-to-br from-blue-500/10 to-violet-500/10 p-5">
-                    <p className="text-xs font-medium uppercase tracking-wide text-(--text-secondary)">
-                      Total for {estimate.travelers} traveler{estimate.travelers > 1 ? 's' : ''},{' '}
-                      {estimate.days} day{estimate.days > 1 ? 's' : ''}
-                    </p>
-                    <p className="font-display text-4xl font-bold text-(--text-primary)">
-                      ${estimate.totalUSD.toLocaleString()}
-                    </p>
-                    <p className="mt-1 text-sm text-(--text-secondary)">
-                      ~${estimate.perDayTotal.toLocaleString()}/day &middot; $
-                      {estimate.perPersonPerDay.toLocaleString()}/person/day
-                    </p>
+                  <div className="mt-5 flex items-center justify-between">
+                    <div className="rounded-2xl bg-gradient-to-br from-blue-500/10 to-violet-500/10 p-5">
+                      <p className="text-xs font-medium uppercase tracking-wide text-(--text-secondary)">
+                        Total for {estimate.travelers} traveler{estimate.travelers > 1 ? 's' : ''},{' '}
+                        {estimate.days} day{estimate.days > 1 ? 's' : ''}
+                      </p>
+                      <p className="font-display text-4xl font-bold text-(--text-primary)">
+                        {displayAmount(estimate.totalUSD)}
+                      </p>
+                      <p className="mt-1 text-sm text-(--text-secondary)">
+                        {showLocal && <>(~${estimate.totalUSD.toLocaleString()} USD) &middot; </>}
+                        ~{displayAmount(estimate.perDayTotal)}/day
+                      </p>
+                    </div>
                   </div>
+
+                  {hasLocalCurrency && (
+                    <div className="mt-3 inline-flex rounded-full border border-(--border-soft) p-1 text-xs font-medium">
+                      <button
+                        type="button"
+                        onClick={() => setShowLocal(false)}
+                        className={`rounded-full px-3 py-1.5 transition-colors ${
+                          !showLocal
+                            ? 'bg-(--surface-card-hover) text-(--text-primary)'
+                            : 'text-(--text-secondary)'
+                        }`}
+                      >
+                        USD
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowLocal(true)}
+                        className={`rounded-full px-3 py-1.5 transition-colors ${
+                          showLocal
+                            ? 'bg-(--surface-card-hover) text-(--text-primary)'
+                            : 'text-(--text-secondary)'
+                        }`}
+                      >
+                        {localCurrencyCode}
+                      </button>
+                    </div>
+                  )}
 
                   <div className="mt-5 space-y-3">
                     {BREAKDOWN_ROWS.map(({ key, label, icon: Icon }) => (
@@ -222,7 +271,7 @@ export default function BudgetEstimator() {
                         </span>
                         <span className="flex-1 text-sm text-(--text-secondary)">{label}</span>
                         <span className="text-sm font-medium text-(--text-primary)">
-                          ${estimate.breakdown[key].toLocaleString()}
+                          {displayAmount(estimate.breakdown[key])}
                         </span>
                       </div>
                     ))}
@@ -234,6 +283,7 @@ export default function BudgetEstimator() {
                       A rough planning estimate, not a live quote — actual costs vary with season,
                       exact dates, and personal spending habits. Flights aren't included since
                       they depend heavily on where you're flying from.
+                      {hasLocalCurrency && ' Currency conversion is an approximate reference rate, not a live rate.'}
                     </p>
                   </div>
 
